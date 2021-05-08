@@ -26,7 +26,6 @@ int main(int argc, char *argv[]) {
     system("chcp.com 65001");
     pmx2txt::txt::Export(std::cout, x);
 
-    /*
     std::ofstream tmpOut("tmp.bin", std::ios::out|std::ios::binary);
     x.dump(tmpOut);
     
@@ -45,5 +44,4 @@ int main(int argc, char *argv[]) {
     PRINT("#rigid body", x.rigid_body_count)
     PRINT("#joint", x.joint_count)
     PRINT("#soft body", x.soft_body_count)
-    */
 }
