@@ -120,7 +120,6 @@ void ExportSkinning(std::ostream& stream, const pmx::Model& model, const pmx::Ve
 
 void ExportVertices(std::ostream& stream, const pmx::Model& model)
 {
-	stream << "頂点数: " << model.vertices.size() << endl;
 	for (size_t i = 0; i < model.vertices.size(); ++i)
 	{
 		auto& vertex = model.vertices[i];
@@ -138,10 +137,25 @@ void ExportVertices(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
+void ExportFaces(std::ostream& stream, const pmx::Model& model)
+{
+	for (int i = 0; i < (model.indices.size() / 3); ++i)
+	{
+		int indices[3];
+		for (int j = 0; j < 3; ++j)
+			indices[j] = model.indices[static_cast<int64_t>(i) * 3 + j];
+		stream << "面" << i << ": " << ArrayToString(indices);
+		stream << endl;
+
+		break;
+	}
+}
+
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 {
 	ExportVersion(stream, model);
 	ExportSetting(stream, model);
 	ExportModelInfo(stream, model);
 	ExportVertices(stream, model);
+	ExportFaces(stream, model);
 }
