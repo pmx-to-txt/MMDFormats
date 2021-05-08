@@ -12,6 +12,8 @@ namespace pmx
 {
 	class SoftBody
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		std::string soft_body_name;
 		std::string soft_body_english_name;
@@ -56,9 +58,9 @@ namespace pmx
 		std::vector<int> pin_vertices;
 
 	public:
-		SoftBody() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		SoftBody(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 
 

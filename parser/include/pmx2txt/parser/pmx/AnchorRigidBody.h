@@ -8,14 +8,16 @@ namespace pmx
 {
 	class AnchorRigidBody
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		int related_rigid_body;
 		int related_vertex;
 		bool is_near;
 
 	public:
-		AnchorRigidBody() noexcept;
-		void parse(std::istream& stream, pmx::Setting *setting);
-		std::size_t dump(std::ostream& stream, pmx::Setting* setting);
+		AnchorRigidBody(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

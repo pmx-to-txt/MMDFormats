@@ -5,8 +5,9 @@
 
 #include "pmx2txt/parser/pmx/Setting.h"
 
-pmx::SoftBody::SoftBody() noexcept
-	: shape(0)
+pmx::SoftBody::SoftBody(const pmx::Setting& setting_) noexcept
+	: setting(setting_)
+	, shape(0)
 	, target_material(0)
 	, group(0)
 	, mask(0)
@@ -44,13 +45,13 @@ pmx::SoftBody::SoftBody() noexcept
 	, pin_vertex_count(0)
 {}
 
-void pmx::SoftBody::parse(std::istream& stream, Setting* setting)
+void pmx::SoftBody::parse(std::istream& stream)
 {
 	// 未実装
 	throw std::runtime_error("Not Implemented Exception");
 }
 
-std::size_t pmx::SoftBody::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::SoftBody::dump(std::ostream& stream)
 {
 	throw std::runtime_error("Not Implemented Exception");
 }

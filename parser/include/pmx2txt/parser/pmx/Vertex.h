@@ -7,12 +7,15 @@
 #include <memory>
 
 #include "pmx2txt/parser/pmx/enum.h"
+#include "pmx2txt/parser/pmx/Setting.h"
 #include "pmx2txt/parser/pmx/VertexSkinning.h"
 
 namespace pmx
 {
 	class Vertex
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		/// 位置
 		float positon[3];
@@ -30,8 +33,8 @@ namespace pmx
 		float edge;
 
 	public:
-		Vertex() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		Vertex(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

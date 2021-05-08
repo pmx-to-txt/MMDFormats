@@ -11,6 +11,8 @@ namespace pmx
 {
 	class Bone
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		/// ボーン名
 		std::string bone_name;
@@ -52,8 +54,8 @@ namespace pmx
 		std::vector<IkLink> ik_links;
 
 	public:
-		Bone() noexcept;
-		void parse(std::istream& stream, pmx::Setting *setting);
-		std::size_t dump(std::ostream& stream, pmx::Setting* setting);
+		Bone(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

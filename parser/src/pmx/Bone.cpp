@@ -5,8 +5,9 @@
 
 #include "pmx2txt/parser/pmx/util.h"
 
-pmx::Bone::Bone() noexcept
-	: parent_index(0)
+pmx::Bone::Bone(const pmx::Setting& setting_) noexcept
+	: setting(setting_)
+	, parent_index(0)
 	, level(0)
 	, bone_flag(0)
 	, target_index(0)
@@ -27,22 +28,22 @@ pmx::Bone::Bone() noexcept
 	}
 }
 
-void pmx::Bone::parse(std::istream& stream, Setting* setting)
+void pmx::Bone::parse(std::istream& stream)
 {
-	this->bone_name = std::move(pmx::util::parseString(stream, setting->encoding));
-	this->bone_english_name = std::move(pmx::util::parseString(stream, setting->encoding));
+	this->bone_name = std::move(pmx::util::parseString(stream, this->setting.encoding));
+	this->bone_english_name = std::move(pmx::util::parseString(stream, this->setting.encoding));
 	stream.read((char*)this->position, sizeof(float) * 3);
-	this->parent_index = pmx::util::parseIndex(stream, setting->bone_index_size);
+	this->parent_index = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 	stream.read((char*)&this->level, sizeof(int));
 	stream.read((char*)&this->bone_flag, sizeof(uint16_t));
 	if (this->bone_flag & 0x0001) {
-		this->target_index = pmx::util::parseIndex(stream, setting->bone_index_size);
+		this->target_index = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 	}
 	else {
 		stream.read((char*)this->offset, sizeof(float) * 3);
 	}
 	if (this->bone_flag & (0x0100 | 0x0200)) {
-		this->grant_parent_index = pmx::util::parseIndex(stream, setting->bone_index_size);
+		this->grant_parent_index = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 		stream.read((char*)&this->grant_weight, sizeof(float));
 	}
 	if (this->bone_flag & 0x0400) {
@@ -56,27 +57,27 @@ void pmx::Bone::parse(std::istream& stream, Setting* setting)
 		stream.read((char*)&this->key, sizeof(int));
 	}
 	if (this->bone_flag & 0x0020) {
-		this->ik_target_bone_index = pmx::util::parseIndex(stream, setting->bone_index_size);
+		this->ik_target_bone_index = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 		stream.read((char*)&ik_loop, sizeof(int));
 		stream.read((char*)&ik_loop_angle_limit, sizeof(float));
 		stream.read((char*)&ik_link_count, sizeof(int));
-		this->ik_links.resize(ik_link_count);
-		for(auto& link : this->ik_links) {
-			link.parse(stream, setting);
+		this->ik_links.reserve(ik_link_count);
+		for (auto i = 0; i < ik_link_count; ++i) {
+			this->ik_links.emplace_back(this->setting).parse(stream);
 		}
 	}
 }
 
-std::size_t pmx::Bone::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::Bone::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpString(stream, this->bone_name, setting->encoding);
-	total += pmx::util::dumpString(stream, this->bone_english_name, setting->encoding);
+	total += pmx::util::dumpString(stream, this->bone_name, this->setting.encoding);
+	total += pmx::util::dumpString(stream, this->bone_english_name, this->setting.encoding);
 
 	stream.write(static_cast<char*>(static_cast<void*>(&this->position)), sizeof(float) * 3);
 	total += sizeof(float) * 3;
 
-	total += pmx::util::dumpIndex(stream, this->parent_index, setting->bone_index_size);
+	total += pmx::util::dumpIndex(stream, this->parent_index, this->setting.bone_index_size);
 
 	stream.write(static_cast<char*>(static_cast<void*>(&this->level)), sizeof(int));
 	total += sizeof(int);
@@ -85,14 +86,14 @@ std::size_t pmx::Bone::dump(std::ostream& stream, Setting* setting)
 	total += sizeof(uint16_t);
 
 	if (this->bone_flag & 0x0001) {
-		total += pmx::util::dumpIndex(stream, this->target_index, setting->bone_index_size);
+		total += pmx::util::dumpIndex(stream, this->target_index, this->setting.bone_index_size);
 	}
 	else {
 		stream.write(static_cast<char*>(static_cast<void*>(&this->offset)), sizeof(float) * 3);
 		total += sizeof(float) * 3;
 	}
 	if (this->bone_flag & (0x0100 | 0x0200)) {
-		total += pmx::util::dumpIndex(stream, this->grant_parent_index, setting->bone_index_size);
+		total += pmx::util::dumpIndex(stream, this->grant_parent_index, this->setting.bone_index_size);
 		stream.write(static_cast<char*>(static_cast<void*>(&this->grant_weight)), sizeof(float));
 		total += sizeof(float);
 	}
@@ -110,7 +111,7 @@ std::size_t pmx::Bone::dump(std::ostream& stream, Setting* setting)
 		total += sizeof(int);
 	}
 	if (this->bone_flag & 0x0020) {
-		total += pmx::util::dumpIndex(stream, this->ik_target_bone_index, setting->bone_index_size);
+		total += pmx::util::dumpIndex(stream, this->ik_target_bone_index, this->setting.bone_index_size);
 
 		stream.write(static_cast<char*>(static_cast<void*>(&this->ik_loop)), sizeof(int));
 		total += sizeof(int);
@@ -122,7 +123,7 @@ std::size_t pmx::Bone::dump(std::ostream& stream, Setting* setting)
 		total += sizeof(int);
 
 		for (int i = 0; i < this->ik_link_count; i++) {
-			total += ik_links[i].dump(stream, setting);
+			total += ik_links[i].dump(stream);
 		}
 	}
 

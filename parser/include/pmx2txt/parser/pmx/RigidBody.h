@@ -9,6 +9,8 @@ namespace pmx
 {
 	class RigidBody
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		/// 剛体名
 		std::string rigid_body_name;
@@ -33,8 +35,8 @@ namespace pmx
 		uint8_t physics_calc_type;
 
 	public:
-		RigidBody() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		RigidBody(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

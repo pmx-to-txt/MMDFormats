@@ -9,9 +9,9 @@ namespace pmx
 	/// リンク
 	class IkLink
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
-		IkLink() noexcept;
-
 		/// リンクボーンインデックス
 		int link_target;
 		/// 角度制限
@@ -20,7 +20,10 @@ namespace pmx
 		float max_radian[3];
 		/// 最小制限角度
 		float min_radian[3];
-		void parse(std::istream& stream, Setting *settingn);
-		std::size_t dump(std::ostream& stream, Setting* settingn);
+
+	public:
+		IkLink(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

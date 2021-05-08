@@ -6,47 +6,23 @@
 #include "pmx2txt/parser/pmx/util.h"
 
 pmx::Model::Model() noexcept
-	: version(0.0f)
-	, vertex_count(0)
-	, index_count(0)
-	, texture_count(0)
-	, material_count(0)
-	, bone_count(0)
-	, morph_count(0)
-	, frame_count(0)
-	, rigid_body_count(0)
-	, joint_count(0)
-	, soft_body_count(0)
+	: version{ 0.0f }
+	, setting{}
+	, model_name{ "" }
+	, model_english_name{ "" }
+	, model_comment{ "" }
+	, model_english_comment{ "" }
+	, vertices()
+	, indices()
+	, textures()
+	, materials()
+	, bones()
+	, morphs()
+	, frames()
+	, rigid_bodies()
+	, joints()
+	, soft_bodies()
 {}
-
-void pmx::Model::Init()
-{
-	this->version = 0.0f;
-	this->model_name.clear();
-	this->model_english_name.clear();
-	this->model_comment.clear();
-	this->model_english_comment.clear();
-	this->vertex_count = 0;
-	this->vertices.clear();
-	this->index_count = 0;
-	this->indices.clear();
-	this->texture_count = 0;
-	this->textures.clear();
-	this->material_count = 0;
-	this->materials.clear();
-	this->bone_count = 0;
-	this->bones.clear();
-	this->morph_count = 0;
-	this->morphs.clear();
-	this->frame_count = 0;
-	this->frames.clear();
-	this->rigid_body_count = 0;
-	this->rigid_bodies.clear();
-	this->joint_count = 0;
-	this->joints.clear();
-	this->soft_body_count = 0;
-	this->soft_bodies.clear();
-}
 
 void pmx::Model::parse(std::istream& stream)
 {
@@ -75,75 +51,102 @@ void pmx::Model::parse(std::istream& stream)
 	this->model_english_comment = std::move(pmx::util::parseString(stream, setting.encoding));
 
 	// 頂点
-	stream.read((char*)&vertex_count, sizeof(int));
-	this->vertices.resize(vertex_count);
-	for (auto& item : this->vertices)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->vertices.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->vertices.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	// 面
-	stream.read((char*)&index_count, sizeof(int));
-	this->indices.resize(index_count);
-	for (auto& item : this->indices)
 	{
-		item = pmx::util::parseIndex(stream, setting.vertex_index_size);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->indices.resize(count);
+		for (auto& item : this->indices)
+		{
+			item = pmx::util::parseIndex(stream, setting.vertex_index_size);
+		}
 	}
-
+	
 	// テクスチャ
-	stream.read((char*)&texture_count, sizeof(int));
-	this->textures.resize(texture_count);
-	for (auto& item : this->textures)
 	{
-		item = pmx::util::parseString(stream, setting.encoding);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->textures.resize(count);
+		for (auto& item : this->textures)
+		{
+			item = pmx::util::parseString(stream, setting.encoding);
+		}
 	}
 
 	// マテリアル
-	stream.read((char*)&material_count, sizeof(int));
-	this->materials.resize(material_count);
-	for(auto& item : this->materials)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->materials.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->materials.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	// ボーン
-	stream.read((char*)&this->bone_count, sizeof(int));
-	this->bones.resize(this->bone_count);
-	for (auto& item : this->bones)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->bones.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->bones.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	// モーフ
-	stream.read((char*)&this->morph_count, sizeof(int));
-	this->morphs.resize(this->morph_count);
-	for (auto& item : this->morphs)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->morphs.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->morphs.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	// 表示枠
-	stream.read((char*)&this->frame_count, sizeof(int));
-	this->frames.resize(this->frame_count);
-	for (auto& item : this->frames)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->frames.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->frames.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	// 剛体
-	stream.read((char*)&this->rigid_body_count, sizeof(int));
-	this->rigid_bodies.resize(this->rigid_body_count);
-	for (auto& item : this->rigid_bodies)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->rigid_bodies.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->rigid_bodies.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	// ジョイント
-	stream.read((char*)&this->joint_count, sizeof(int));
-	this->joints.resize(this->joint_count);
-	for (auto& item : this->joints)
 	{
-		item.parse(stream, &setting);
+		int count{ 0 };
+		stream.read((char*)&count, sizeof(int));
+		this->joints.reserve(count);
+		for (auto i = 0; i < count; ++i)
+		{
+			this->joints.emplace_back(this->setting).parse(stream);
+		}
 	}
 
 	//// ソフトボディ
@@ -181,17 +184,23 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	total += pmx::util::dumpString(stream, this->model_english_comment, setting.encoding);
 
 	// 頂点
-	stream.write(static_cast<char*>(static_cast<void*>(&this->vertex_count)), sizeof(int));
-	total += sizeof(int);
-
-	for(auto& item : this->vertices)
 	{
-		total += item.dump(stream, &setting);
+		int count = this->vertices.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
+
+	for (auto& item : this->vertices)
+	{
+		total += item.dump(stream);
 	}
 
 	// 面
-	stream.write(static_cast<char*>(static_cast<void*>(&this->index_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->indices.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->indices)
 	{
@@ -199,8 +208,11 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	}
 
 	// テクスチャ
-	stream.write(static_cast<char*>(static_cast<void*>(&this->texture_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->textures.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->textures)
 	{
@@ -208,57 +220,75 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	}
 
 	// マテリアル
-	stream.write(static_cast<char*>(static_cast<void*>(&this->material_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->materials.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->materials)
 	{
-		total += item.dump(stream, &setting);
+		total += item.dump(stream);
 	}
 
 	// ボーン
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->bones.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->bones)
 	{
-		total += item.dump(stream, &setting);
+		total += item.dump(stream);
 	}
 
 	// モーフ
-	stream.write(static_cast<char*>(static_cast<void*>(&this->morph_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->morphs.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->morphs)
 	{
-		total += item.dump(stream, &setting);
+		total += item.dump(stream);
 	}
 
 	// 表示枠
-	stream.write(static_cast<char*>(static_cast<void*>(&this->frame_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->frames.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->frames)
 	{
-		total += item.dump(stream, &setting);
+		total += item.dump(stream);
 	}
 
 	// 剛体
-	stream.write(static_cast<char*>(static_cast<void*>(&this->rigid_body_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->rigid_bodies.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->rigid_bodies)
 	{
-		total += item.dump(stream, &setting);
+		total += item.dump(stream);
 	}
 
 	// ジョイント
-	stream.write(static_cast<char*>(static_cast<void*>(&this->joint_count)), sizeof(int));
-	total += sizeof(int);
+	{
+		int count = this->joints.size();
+		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		total += sizeof(int);
+	}
 
 	for (auto& item : this->joints)
 	{
-		total += item.dump(stream, &setting);
+		total += item.dump(stream);
 	}
 	return total;
 }

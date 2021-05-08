@@ -11,6 +11,8 @@ namespace pmx
 	/// 枠内要素
 	class FrameElement
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		/// 要素対象
 		uint8_t element_target;
@@ -18,14 +20,16 @@ namespace pmx
 		int index;
 
 	public:
-		FrameElement() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		FrameElement(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 
 	/// 表示枠
 	class Frame
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		/// 枠名
 		std::string frame_name;
@@ -39,8 +43,8 @@ namespace pmx
 		std::vector<pmx::FrameElement> elements;
 
 	public:
-		Frame() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		Frame(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

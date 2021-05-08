@@ -5,8 +5,9 @@
 
 #include "pmx2txt/parser/pmx/util.h"
 
-pmx::RigidBody::RigidBody() noexcept
-	: target_bone(0)
+pmx::RigidBody::RigidBody(const pmx::Setting& setting_) noexcept
+	: setting(setting_)
+	, target_bone(0)
 	, group(0)
 	, mask(0)
 	, shape(0)
@@ -24,11 +25,11 @@ pmx::RigidBody::RigidBody() noexcept
 	}
 }
 
-void pmx::RigidBody::parse(std::istream& stream, Setting* setting)
+void pmx::RigidBody::parse(std::istream& stream)
 {
-	this->rigid_body_name = pmx::util::parseString(stream, setting->encoding);
-	this->rigid_body_english_name = pmx::util::parseString(stream, setting->encoding);
-	this->target_bone = pmx::util::parseIndex(stream, setting->bone_index_size);
+	this->rigid_body_name = pmx::util::parseString(stream, this->setting.encoding);
+	this->rigid_body_english_name = pmx::util::parseString(stream, this->setting.encoding);
+	this->target_bone = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 	stream.read((char*)&this->group, sizeof(uint8_t));
 	stream.read((char*)&this->mask, sizeof(uint16_t));
 	stream.read((char*)&this->shape, sizeof(uint8_t));
@@ -43,12 +44,12 @@ void pmx::RigidBody::parse(std::istream& stream, Setting* setting)
 	stream.read((char*)&this->physics_calc_type, sizeof(uint8_t));
 }
 
-std::size_t pmx::RigidBody::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::RigidBody::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpString(stream, this->rigid_body_name, setting->encoding);
-	total += pmx::util::dumpString(stream, this->rigid_body_english_name, setting->encoding);
-	total += pmx::util::dumpIndex(stream, this->target_bone, setting->bone_index_size);
+	total += pmx::util::dumpString(stream, this->rigid_body_name, this->setting.encoding);
+	total += pmx::util::dumpString(stream, this->rigid_body_english_name, this->setting.encoding);
+	total += pmx::util::dumpIndex(stream, this->target_bone, this->setting.bone_index_size);
 
 	stream.write(static_cast<char*>(static_cast<void*>(&this->group)), sizeof(uint8_t));
 	stream.write(static_cast<char*>(static_cast<void*>(&this->mask)), sizeof(uint16_t));

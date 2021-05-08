@@ -65,6 +65,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
+target_compile_features(${PROJECT_NAME} PUBLIC
+    cxx_std_17
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CMAKE_CXX_STANDARD 17
     CMAKE_CXX_STANDARD_REQUIRED ON
@@ -91,8 +95,6 @@ if(PMX2TXT_INSTALL)
         NAMESPACE PMX2TXT::
         DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/${PROJECT_NAME}"
     )
-
-
 endif(PMX2TXT_INSTALL)
 
 ### Filter Settings for Visual Studio
