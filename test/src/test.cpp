@@ -1,4 +1,5 @@
 #include "pmx2txt/parser/Pmx.h"
+#include "pmx2txt/parser/Txt.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,6 +23,9 @@ int main(int argc, char *argv[]) {
     pmx::Model x;
     x.parse(is);
 
+    pmx2txt::txt::Export(std::cout, x);
+
+    /*
     std::ofstream tmpOut("tmp.bin", std::ios::out|std::ios::binary);
     x.dump(tmpOut);
     
@@ -40,4 +44,5 @@ int main(int argc, char *argv[]) {
     PRINT("#rigid body", x.rigid_body_count)
     PRINT("#joint", x.joint_count)
     PRINT("#soft body", x.soft_body_count)
+    */
 }
