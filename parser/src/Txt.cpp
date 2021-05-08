@@ -6,7 +6,7 @@ using namespace std;
 
 void ExportVersion(std::ostream& stream, const pmx::Model& model)
 {
-	stream << "PMX バージョン: " << fixed << setprecision(1) << model.version << defaultfloat << endl;
+	stream << "PMX バージョン: " << fixed << setprecision(2) << model.version << defaultfloat << endl;
 }
 
 using UEncoding = uint8_t;
