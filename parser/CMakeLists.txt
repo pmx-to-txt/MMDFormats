@@ -29,6 +29,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     include/pmx2txt/parser/pmx/Vertex.h
     include/pmx2txt/parser/pmx/VertexSkinning.h
     include/pmx2txt/parser/converter.h
+    include/pmx2txt/parser/Txt.h
 
     src/pmx/AnchorRigidBody.cpp
     src/pmx/Bone.cpp
@@ -46,6 +47,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
     src/pmx/util.cpp
     src/converter.cpp
+    src/Txt.cpp
 )
 
 if(MSVC)

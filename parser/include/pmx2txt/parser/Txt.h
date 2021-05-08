@@ -1,0 +1,4 @@
+#ifndef PMX2TXT_PARSER_TXT_H
+#define PMX2TXT_PARSER_TXT_H
+
+#endif
