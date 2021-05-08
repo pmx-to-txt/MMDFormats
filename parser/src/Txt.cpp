@@ -4,7 +4,12 @@
 
 using namespace std;
 
-void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
+void ExportVersion(std::ostream& stream, const pmx::Model& model)
 {
 	stream << "Version: " << fixed << setprecision(1) << model.version << defaultfloat << endl;
+}
+
+void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
+{
+	ExportVersion(stream, model);
 }
