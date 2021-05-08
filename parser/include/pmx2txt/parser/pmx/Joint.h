@@ -9,6 +9,8 @@ namespace pmx
 {
 	class JointParam
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		int rigid_body1;
 		int rigid_body2;
@@ -22,13 +24,15 @@ namespace pmx
 		float spring_rotation_coefficient[3];
 
 	public:
-		JointParam() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		JointParam(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 
 	class Joint
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		std::string joint_name;
 		std::string joint_english_name;
@@ -36,7 +40,8 @@ namespace pmx
 		JointParam param;
 
 	public:
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		Joint(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

@@ -6,54 +6,62 @@
 #include "pmx2txt/parser/pmx/enum.h"
 #include "pmx2txt/parser/pmx/util.h"
 
-pmx::MorphVertexOffset::MorphVertexOffset() noexcept
-	: vertex_index(0)
+pmx::MorphOffset::MorphOffset(const pmx::Setting& setting_) noexcept
+	: setting(setting_)
+{
+}
+
+pmx::MorphVertexOffset::MorphVertexOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, vertex_index(0)
 {
 	for (int i = 0; i < 3; ++i) {
 		position_offset[i] = 0.0f;
 	}
 }
 
-void pmx::MorphVertexOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphVertexOffset::parse(std::istream& stream)
 {
-	this->vertex_index = pmx::util::parseIndex(stream, setting->vertex_index_size);
+	this->vertex_index = pmx::util::parseIndex(stream, this->setting.vertex_index_size);
 	stream.read((char*)this->position_offset, sizeof(float) * 3);
 }
 
-std::size_t pmx::MorphVertexOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphVertexOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->vertex_index, setting->vertex_index_size);
+	total += pmx::util::dumpIndex(stream, this->vertex_index, this->setting.vertex_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->position_offset)), sizeof(float) * 3);
 	total += sizeof(float) * 3;
 	return total;
 }
 
-pmx::MorphUVOffset::MorphUVOffset() noexcept
-	: vertex_index(0)
+pmx::MorphUVOffset::MorphUVOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, vertex_index(0)
 {
 	for (int i = 0; i < 4; ++i) {
 		uv_offset[i] = 0.0f;
 	}
 }
 
-void pmx::MorphUVOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphUVOffset::parse(std::istream& stream)
 {
-	this->vertex_index = pmx::util::parseIndex(stream, setting->vertex_index_size);
+	this->vertex_index = pmx::util::parseIndex(stream, this->setting.vertex_index_size);
 	stream.read((char*)this->uv_offset, sizeof(float) * 4);
 }
 
-std::size_t pmx::MorphUVOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphUVOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->vertex_index, setting->vertex_index_size);
+	total += pmx::util::dumpIndex(stream, this->vertex_index, this->setting.vertex_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->uv_offset)), sizeof(float) * 4);
 	total += sizeof(float) * 4;
 	return total;
 }
 
-pmx::MorphBoneOffset::MorphBoneOffset() noexcept
-	: bone_index(0)
+pmx::MorphBoneOffset::MorphBoneOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, bone_index(0)
 {
 	for (int i = 0; i < 3; ++i) {
 		translation[i] = 0.0f;
@@ -63,25 +71,26 @@ pmx::MorphBoneOffset::MorphBoneOffset() noexcept
 	}
 }
 
-void pmx::MorphBoneOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphBoneOffset::parse(std::istream& stream)
 {
-	this->bone_index = pmx::util::parseIndex(stream, setting->bone_index_size);
+	this->bone_index = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 	stream.read((char*)this->translation, sizeof(float) * 3);
 	stream.read((char*)this->rotation, sizeof(float) * 4);
 }
 
-std::size_t pmx::MorphBoneOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphBoneOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->bone_index, setting->bone_index_size);
+	total += pmx::util::dumpIndex(stream, this->bone_index, this->setting.bone_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->translation)), sizeof(float) * 3);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->rotation)), sizeof(float) * 4);
 	total += sizeof(float) * 7;
 	return total;
 }
 
-pmx::MorphMaterialOffset::MorphMaterialOffset() noexcept
-	: specularity(0.0f)
+pmx::MorphMaterialOffset::MorphMaterialOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, specularity(0.0f)
 	, edge_size(0.0f)
 {
 	for (int i = 0; i < 3; ++i) {
@@ -97,9 +106,9 @@ pmx::MorphMaterialOffset::MorphMaterialOffset() noexcept
 	}
 }
 
-void pmx::MorphMaterialOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphMaterialOffset::parse(std::istream& stream)
 {
-	this->material_index = pmx::util::parseIndex(stream, setting->material_index_size);
+	this->material_index = pmx::util::parseIndex(stream, this->setting.material_index_size);
 	stream.read((char*)&this->offset_operation, sizeof(uint8_t));
 	stream.read((char*)this->diffuse, sizeof(float) * 4);
 	stream.read((char*)this->specular, sizeof(float) * 3);
@@ -112,10 +121,10 @@ void pmx::MorphMaterialOffset::parse(std::istream& stream, Setting* setting)
 	stream.read((char*)this->toon_texture_argb, sizeof(float) * 4);
 }
 
-std::size_t pmx::MorphMaterialOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphMaterialOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->material_index, setting->material_index_size);
+	total += pmx::util::dumpIndex(stream, this->material_index, this->setting.material_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->offset_operation)), sizeof(uint8_t));
 	stream.write(static_cast<char*>(static_cast<void*>(&this->diffuse)), sizeof(float) * 4);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->specular)), sizeof(float) * 3);
@@ -130,48 +139,51 @@ std::size_t pmx::MorphMaterialOffset::dump(std::ostream& stream, Setting* settin
 	return total;
 }
 
-pmx::MorphGroupOffset::MorphGroupOffset() noexcept
-	: morph_index(0)
+pmx::MorphGroupOffset::MorphGroupOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, morph_index(0)
 	, morph_weight(0.0f)
 {}
 
-void pmx::MorphGroupOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphGroupOffset::parse(std::istream& stream)
 {
-	this->morph_index = pmx::util::parseIndex(stream, setting->morph_index_size);
+	this->morph_index = pmx::util::parseIndex(stream, this->setting.morph_index_size);
 	stream.read((char*)&this->morph_weight, sizeof(float));
 }
 
-std::size_t pmx::MorphGroupOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphGroupOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->morph_index, setting->morph_index_size);
+	total += pmx::util::dumpIndex(stream, this->morph_index, this->setting.morph_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->morph_weight)), sizeof(float));
 	total += sizeof(float);
 	return total;
 }
 
-pmx::MorphFlipOffset::MorphFlipOffset() noexcept
-	: morph_index(0)
+pmx::MorphFlipOffset::MorphFlipOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, morph_index(0)
 	, morph_value(0.0f)
 {}
 
-void pmx::MorphFlipOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphFlipOffset::parse(std::istream& stream)
 {
-	this->morph_index = pmx::util::parseIndex(stream, setting->morph_index_size);
+	this->morph_index = pmx::util::parseIndex(stream, this->setting.morph_index_size);
 	stream.read((char*)&this->morph_value, sizeof(float));
 }
 
-std::size_t pmx::MorphFlipOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphFlipOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->morph_index, setting->morph_index_size);
+	total += pmx::util::dumpIndex(stream, this->morph_index, this->setting.morph_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->morph_value)), sizeof(float));
 	total += sizeof(float);
 	return total;
 }
 
-pmx::MorphImpulseOffset::MorphImpulseOffset() noexcept
-	: rigid_body_index(0)
+pmx::MorphImpulseOffset::MorphImpulseOffset(const pmx::Setting& setting_) noexcept
+	: pmx::MorphOffset(setting_)
+	, rigid_body_index(0)
 	, is_local(0)
 {
 	for (int i = 0; i < 3; ++i) {
@@ -180,18 +192,18 @@ pmx::MorphImpulseOffset::MorphImpulseOffset() noexcept
 	}
 }
 
-void pmx::MorphImpulseOffset::parse(std::istream& stream, Setting* setting)
+void pmx::MorphImpulseOffset::parse(std::istream& stream)
 {
-	this->rigid_body_index = pmx::util::parseIndex(stream, setting->rigidbody_index_size);
+	this->rigid_body_index = pmx::util::parseIndex(stream, this->setting.rigidbody_index_size);
 	stream.read((char*)&this->is_local, sizeof(uint8_t));
 	stream.read((char*)this->velocity, sizeof(float) * 3);
 	stream.read((char*)this->angular_torque, sizeof(float) * 3);
 }
 
-std::size_t pmx::MorphImpulseOffset::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::MorphImpulseOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpIndex(stream, this->rigid_body_index, setting->rigidbody_index_size);
+	total += pmx::util::dumpIndex(stream, this->rigid_body_index, this->setting.rigidbody_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->is_local)), sizeof(uint8_t));
 	stream.write(static_cast<char*>(static_cast<void*>(&this->velocity)), sizeof(float) * 3);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->angular_torque)), sizeof(float) * 3);
@@ -199,46 +211,47 @@ std::size_t pmx::MorphImpulseOffset::dump(std::ostream& stream, Setting* setting
 	return total;
 }
 
-pmx::Morph::Morph() noexcept
-	: offset_count(0)
+pmx::Morph::Morph(const pmx::Setting& setting_) noexcept
+	: setting(setting_)
+	, offset_count(0)
 {
 }
 
-void pmx::Morph::parse(std::istream& stream, Setting* setting)
+void pmx::Morph::parse(std::istream& stream)
 {
-	this->morph_name = pmx::util::parseString(stream, setting->encoding);
-	this->morph_english_name = pmx::util::parseString(stream, setting->encoding);
+	this->morph_name = pmx::util::parseString(stream, this->setting.encoding);
+	this->morph_english_name = pmx::util::parseString(stream, this->setting.encoding);
 	stream.read((char*)&category, sizeof(MorphCategory));
 	stream.read((char*)&morph_type, sizeof(MorphType));
 	stream.read((char*)&this->offset_count, sizeof(int));
 	switch (this->morph_type)
 	{
 	case MorphType::Group:
-		this->group_offsets.resize(this->offset_count);
-		for(auto& item :this->group_offsets)
+		this->group_offsets.reserve(this->offset_count);
+		for (auto i = 0; i < this->offset_count; ++i)
 		{
-			item.parse(stream, setting);
+			this->group_offsets.emplace_back(this->setting).parse(stream);
 		}
 		break;
 	case MorphType::Vertex:
-		this->vertex_offsets.resize(this->offset_count);
-		for (auto& item : this->vertex_offsets)
+		this->vertex_offsets.reserve(this->offset_count);
+		for (auto i = 0; i < this->offset_count; ++i)
 		{
-			item.parse(stream, setting);
+			this->vertex_offsets.emplace_back(this->setting).parse(stream);
 		}
 		break;
 	case MorphType::Bone:
-		this->bone_offsets.resize(this->offset_count);
-		for (auto& item : this->bone_offsets)
+		this->bone_offsets.reserve(this->offset_count);
+		for (auto i = 0; i < this->offset_count; ++i)
 		{
-			item.parse(stream, setting);
+			this->bone_offsets.emplace_back(this->setting).parse(stream);
 		}
 		break;
 	case MorphType::Matrial:
-		this->material_offsets.resize(this->offset_count);
-		for (auto& item : this->material_offsets)
+		this->material_offsets.reserve(this->offset_count);
+		for (auto i = 0; i < this->offset_count; ++i)
 		{
-			item.parse(stream, setting);
+			this->material_offsets.emplace_back(this->setting).parse(stream);
 		}
 		break;
 	case MorphType::UV:
@@ -246,10 +259,10 @@ void pmx::Morph::parse(std::istream& stream, Setting* setting)
 	case MorphType::AdditionalUV2:
 	case MorphType::AdditionalUV3:
 	case MorphType::AdditionalUV4:
-		this->uv_offsets.resize(this->offset_count);
-		for (auto& item : this->uv_offsets)
+		this->uv_offsets.reserve(this->offset_count);
+		for (auto i = 0; i < this->offset_count; ++i)
 		{
-			item.parse(stream, setting);
+			this->uv_offsets.emplace_back(this->setting).parse(stream);
 		}
 		break;
 	default:
@@ -257,11 +270,11 @@ void pmx::Morph::parse(std::istream& stream, Setting* setting)
 	}
 }
 
-std::size_t pmx::Morph::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::Morph::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	total += pmx::util::dumpString(stream, this->morph_name, setting->encoding);
-	total += pmx::util::dumpString(stream, this->morph_english_name, setting->encoding);
+	total += pmx::util::dumpString(stream, this->morph_name, this->setting.encoding);
+	total += pmx::util::dumpString(stream, this->morph_english_name, this->setting.encoding);
 
 
 	stream.write(static_cast<char*>(static_cast<void*>(&this->category)), sizeof(MorphCategory));
@@ -278,25 +291,25 @@ std::size_t pmx::Morph::dump(std::ostream& stream, Setting* setting)
 	case MorphType::Group:
 		for (int i = 0; i < offset_count; i++)
 		{
-			total += group_offsets[i].dump(stream, setting);
+			total += group_offsets[i].dump(stream);
 		}
 		break;
 	case MorphType::Vertex:
 		for (int i = 0; i < offset_count; i++)
 		{
-			total += vertex_offsets[i].dump(stream, setting);
+			total += vertex_offsets[i].dump(stream);
 		}
 		break;
 	case MorphType::Bone:
 		for (int i = 0; i < offset_count; i++)
 		{
-			total += bone_offsets[i].dump(stream, setting);
+			total += bone_offsets[i].dump(stream);
 		}
 		break;
 	case MorphType::Matrial:
 		for (int i = 0; i < offset_count; i++)
 		{
-			total += material_offsets[i].dump(stream, setting);
+			total += material_offsets[i].dump(stream);
 		}
 		break;
 	case MorphType::UV:
@@ -306,7 +319,7 @@ std::size_t pmx::Morph::dump(std::ostream& stream, Setting* setting)
 	case MorphType::AdditionalUV4:
 		for (int i = 0; i < offset_count; i++)
 		{
-			total += uv_offsets[i].dump(stream, setting);
+			total += uv_offsets[i].dump(stream);
 		}
 		break;
 	default:

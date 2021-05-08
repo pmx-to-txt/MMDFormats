@@ -1,5 +1,3 @@
-#pragma once
-
 #include "pmx2txt/parser/pmx/util.h"
 
 #include "pmx2txt/parser/converter.h"

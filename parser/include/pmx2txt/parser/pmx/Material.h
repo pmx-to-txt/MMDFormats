@@ -10,6 +10,8 @@ namespace pmx
 	/// マテリアル
 	class Material
 	{
+	private:
+		const pmx::Setting& setting;
 	public:
 		/// モデル名
 		std::string material_name;
@@ -45,8 +47,8 @@ namespace pmx
 		int index_count;
 
 	public:
-		Material() noexcept;
-		void parse(std::istream& stream, Setting *setting);
-		std::size_t dump(std::ostream& stream, Setting* setting);
+		Material(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stream);
+		std::size_t dump(std::ostream& stream);
 	};
 }

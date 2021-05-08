@@ -6,8 +6,9 @@
 #include "pmx2txt/parser/pmx/Setting.h"
 #include "pmx2txt/parser/pmx/util.h"
 
-pmx::Vertex::Vertex() noexcept
-: edge(0.0f)
+pmx::Vertex::Vertex(const pmx::Setting& setting_) noexcept
+	: setting(setting_)
+	, edge(0.0f)
 {
 	uv[0] = uv[1] = 0.0f;
 	for (int i = 0; i < 3; ++i) {
@@ -21,12 +22,12 @@ pmx::Vertex::Vertex() noexcept
 	}
 }
 
-void pmx::Vertex::parse(std::istream& stream, Setting* setting)
+void pmx::Vertex::parse(std::istream& stream)
 {
 	stream.read((char*)this->positon, sizeof(float) * 3);
 	stream.read((char*)this->normal, sizeof(float) * 3);
 	stream.read((char*)this->uv, sizeof(float) * 2);
-	for (int i = 0; i < setting->uv; ++i)
+	for (int i = 0; i < this->setting.uv; ++i)
 	{
 		stream.read((char*)this->uva[i], sizeof(float) * 4);
 	}
@@ -34,24 +35,24 @@ void pmx::Vertex::parse(std::istream& stream, Setting* setting)
 	switch (this->skinning_type)
 	{
 	case pmx::VertexSkinningType::BDEF1:
-		this->skinning = std::make_unique<pmx::VertexSkinningBDEF1>();
-		this->skinning->parse(stream, setting);
+		this->skinning = std::make_unique<pmx::VertexSkinningBDEF1>(this->setting);
+		this->skinning->parse(stream);
 		break;
 	case pmx::VertexSkinningType::BDEF2:
-		this->skinning = std::make_unique<pmx::VertexSkinningBDEF2>();
-		this->skinning->parse(stream, setting);
+		this->skinning = std::make_unique<pmx::VertexSkinningBDEF2>(this->setting);
+		this->skinning->parse(stream);
 		break;
 	case pmx::VertexSkinningType::BDEF4:
-		this->skinning = std::make_unique<pmx::VertexSkinningBDEF4>();
-		this->skinning->parse(stream, setting);
+		this->skinning = std::make_unique<pmx::VertexSkinningBDEF4>(this->setting);
+		this->skinning->parse(stream);
 		break;
 	case pmx::VertexSkinningType::SDEF:
-		this->skinning = std::make_unique<pmx::VertexSkinningSDEF>();
-		this->skinning->parse(stream, setting);
+		this->skinning = std::make_unique<pmx::VertexSkinningSDEF>(this->setting);
+		this->skinning->parse(stream);
 		break;
 	case pmx::VertexSkinningType::QDEF:
-		this->skinning = std::make_unique<pmx::VertexSkinningQDEF>();
-		this->skinning->parse(stream, setting);
+		this->skinning = std::make_unique<pmx::VertexSkinningQDEF>(this->setting);
+		this->skinning->parse(stream);
 		break;
 	default:
 		throw "invalid skinning type";
@@ -60,21 +61,21 @@ void pmx::Vertex::parse(std::istream& stream, Setting* setting)
 	stream.read((char*)&this->edge, sizeof(float));
 }
 
-std::size_t pmx::Vertex::dump(std::ostream& stream, Setting* setting)
+std::size_t pmx::Vertex::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
 	stream.write(static_cast<char*>(static_cast<void*>(this->positon)), sizeof(float) * 3);
 	stream.write(static_cast<char*>(static_cast<void*>(this->normal)), sizeof(float) * 3);
 	stream.write(static_cast<char*>(static_cast<void*>(this->uv)), sizeof(float) * 2);
 	total += sizeof(float) * 8;
-	for (uint8_t i = 0; i < setting->uv; ++i)
+	for (uint8_t i = 0; i < this->setting.uv; ++i)
 	{
 		stream.write(static_cast<char*>(static_cast<void*>(this->uva[i])), sizeof(float) * 4);
 		total += sizeof(float) * 4;
 	}
 	stream.write(static_cast<char*>(static_cast<void*>(&this->skinning_type)), sizeof(pmx::VertexSkinningType));
 	total += sizeof(pmx::VertexSkinningType);
-	total += this->skinning->dump(stream, setting);
+	total += this->skinning->dump(stream);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->edge)), sizeof(float));
 	total += sizeof(float);
 	return total;

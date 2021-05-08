@@ -8,9 +8,12 @@ namespace pmx
 {
 	class VertexSkinning
 	{
+	protected:
+		const pmx::Setting& setting;
 	public:
-		virtual void parse(std::istream& stream, Setting *setting) = 0;
-		virtual std::size_t dump(std::ostream& stream, Setting* setting) = 0;
+		VertexSkinning(const pmx::Setting& setting_) noexcept;
+		virtual void parse(std::istream& stream) = 0;
+		virtual std::size_t dump(std::ostream& stream) = 0;
 	};
 
 	class VertexSkinningBDEF1 : public VertexSkinning
@@ -19,9 +22,9 @@ namespace pmx
 		int bone_index;
 
 	public:
-		VertexSkinningBDEF1() noexcept;
-		void parse(std::istream& stresam, Setting *setting) override;
-		std::size_t dump(std::ostream& stream, Setting* setting) override;
+		VertexSkinningBDEF1(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stresam) override;
+		std::size_t dump(std::ostream& stream) override;
 	};
 
 	class VertexSkinningBDEF2 : public VertexSkinning
@@ -32,9 +35,9 @@ namespace pmx
 		float bone_weight;
 
 	public:
-		VertexSkinningBDEF2() noexcept;
-		void parse(std::istream& stresam, Setting *setting)override;
-		std::size_t dump(std::ostream& stream, Setting* setting) override;
+		VertexSkinningBDEF2(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stresam)override;
+		std::size_t dump(std::ostream& stream) override;
 	};
 
 	class VertexSkinningBDEF4 : public VertexSkinning
@@ -50,9 +53,9 @@ namespace pmx
 		float bone_weight4;
 
 	public:
-		VertexSkinningBDEF4() noexcept;
-		void parse(std::istream& stresam, Setting *setting)override;
-		std::size_t dump(std::ostream& stream, Setting* setting) override;
+		VertexSkinningBDEF4(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stresam)override;
+		std::size_t dump(std::ostream& stream) override;
 	};
 
 	class VertexSkinningSDEF : public VertexSkinning
@@ -66,9 +69,9 @@ namespace pmx
 		float sdef_r1[3];
 
 	public:
-		VertexSkinningSDEF() noexcept;
-		void parse(std::istream& stresam, Setting *setting)override;
-		std::size_t dump(std::ostream& stream, Setting* setting) override;
+		VertexSkinningSDEF(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stresam)override;
+		std::size_t dump(std::ostream& stream) override;
 	};
 
 	class VertexSkinningQDEF : public VertexSkinning
@@ -84,8 +87,8 @@ namespace pmx
 		float bone_weight4;
 
 	public:
-		VertexSkinningQDEF() noexcept;
-		void parse(std::istream& stresam, Setting *setting)override;
-		std::size_t dump(std::ostream& stream, Setting* setting) override;
+		VertexSkinningQDEF(const pmx::Setting& setting_) noexcept;
+		void parse(std::istream& stresam)override;
+		std::size_t dump(std::ostream& stream) override;
 	};
 }
