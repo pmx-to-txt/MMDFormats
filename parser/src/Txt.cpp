@@ -1,12 +1,14 @@
 #include "pmx2txt/parser/Txt.h"
 
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 
 void ExportVersion(std::ostream& stream, const pmx::Model& model)
 {
-	stream << "PMX バージョン: " << fixed << setprecision(2) << model.version << defaultfloat << endl;
+	auto defaultPrecision = stream.precision();
+	stream << "PMX バージョン: " << fixed << setprecision(2) << model.version << defaultfloat << setprecision(defaultPrecision) << endl;
 }
 
 using UEncoding = uint8_t;
@@ -41,9 +43,105 @@ void ExportModelInfo(std::ostream& stream, const pmx::Model& model)
 	stream << "----------------" << endl;
 }
 
+template<typename T, size_t size>
+string ArrayToString(T(&arr)[size])
+{
+	auto ss = stringstream{};
+	ss << "(";
+	for (size_t i = 0; i < size; ++i)
+	{
+		ss << arr[i];
+		if (i < size - 1)
+			ss << ",";
+		else
+			ss << ")";
+	}
+	return ss.str();
+}
+
+string BoneIdxToString(int idx, const pmx::Model& model)
+{
+	if (0 <= idx && idx < model.bones.size())
+		return model.bones[idx].bone_name;
+	else
+		return "";
+}
+
+void ExportBDEF1(std::ostream& stream, const pmx::Model& model, const pmx::VertexSkinningBDEF1& skinning)
+{
+	stream << "BDEF1(";
+	stream << BoneIdxToString(skinning.bone_index, model) << ":" << 1.0f << ")";
+}
+
+void ExportBDEF2(std::ostream& stream, const pmx::Model& model, const pmx::VertexSkinningBDEF2& skinning)
+{
+	stream << "BDEF2(";
+	stream << BoneIdxToString(skinning.bone_index1, model) << ":" << skinning.bone_weight << ",";
+	stream << BoneIdxToString(skinning.bone_index2, model) << ":" << (1.0f - skinning.bone_weight) << ")";
+}
+
+void ExportBDEF4(std::ostream& stream, const pmx::Model& model, const pmx::VertexSkinningBDEF4& skinning)
+{
+	stream << "BDEF4(";
+	stream << BoneIdxToString(skinning.bone_index1, model) << ":" << skinning.bone_weight1 << ",";
+	stream << BoneIdxToString(skinning.bone_index2, model) << ":" << skinning.bone_weight2 << ",";
+	stream << BoneIdxToString(skinning.bone_index3, model) << ":" << skinning.bone_weight3 << ",";
+	stream << BoneIdxToString(skinning.bone_index4, model) << ":" << skinning.bone_weight4 << ")";
+}
+
+void ExportSDEF(std::ostream& stream, const pmx::Model& model, const pmx::VertexSkinningSDEF& skinning)
+{
+	stream << "SDEF(";
+	stream << BoneIdxToString(skinning.bone_index1, model) << ":" << skinning.bone_weight << ",";
+	stream << BoneIdxToString(skinning.bone_index2, model) << ":" << (1.0f - skinning.bone_weight) << ")";
+}
+
+struct UnknownSkinning : exception {};
+void ExportSkinning(std::ostream& stream, const pmx::Model& model, const pmx::Vertex& vertex)
+{
+	switch (vertex.skinning_type)
+	{
+	case pmx::VertexSkinningType::BDEF1:
+		ExportBDEF1(stream, model, static_cast<const pmx::VertexSkinningBDEF1&>(*vertex.skinning));
+		break;
+	case pmx::VertexSkinningType::BDEF2:
+		ExportBDEF2(stream, model, static_cast<const pmx::VertexSkinningBDEF2&>(*vertex.skinning));
+		break;
+	case pmx::VertexSkinningType::BDEF4:
+		ExportBDEF4(stream, model, static_cast<const pmx::VertexSkinningBDEF4&>(*vertex.skinning));
+		break;
+	case pmx::VertexSkinningType::SDEF:
+		ExportSDEF(stream, model, static_cast<const pmx::VertexSkinningSDEF&>(*vertex.skinning));
+		break;
+	default:
+		throw UnknownSkinning{};
+	}
+}
+
+void ExportVertices(std::ostream& stream, const pmx::Model& model)
+{
+	stream << "頂点数: " << model.vertices.size() << endl;
+	for (size_t i = 0; i < model.vertices.size(); ++i)
+	{
+		auto& vertex = model.vertices[i];
+		stream << "頂点" << i << ": ";
+		stream << "位置" << ArrayToString(vertex.positon) << ",";
+		stream << "法線" << ArrayToString(vertex.normal) << ",";
+		stream << "エッジ倍率(" << vertex.edge << "),";
+		stream << "UV" << ArrayToString(vertex.uv) << ",";
+		for (size_t j = 0; j < model.setting.uv; ++j)
+			stream << "追加UV" << (j + 1) << ArrayToString(vertex.uva[j]) << ",";
+		ExportSkinning(stream, model, vertex);
+		stream << endl;
+
+		break;
+	}
+}
+
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 {
 	ExportVersion(stream, model);
 	ExportSetting(stream, model);
 	ExportModelInfo(stream, model);
+	ExportVertices(stream, model);
 }
