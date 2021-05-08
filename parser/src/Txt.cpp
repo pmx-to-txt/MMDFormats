@@ -11,7 +11,7 @@ void ExportVersion(std::ostream& stream, const pmx::Model& model)
 
 using UEncoding = uint8_t;
 struct UnknownEncoding : exception {};
-string ToString(UEncoding encoding)
+string EncodingToString(UEncoding encoding)
 {
 	switch (encoding)
 	{
@@ -23,7 +23,8 @@ string ToString(UEncoding encoding)
 
 void ExportSetting(std::ostream& stream, const pmx::Model& model)
 {
-	stream << "文字エンコード: " << ToString(model.setting.encoding) << endl;
+	stream << "文字エンコード: " << EncodingToString(model.setting.encoding) << endl;
+	stream << "追加UV数: " << static_cast<int>(model.setting.uv) << endl;
 }
 
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
