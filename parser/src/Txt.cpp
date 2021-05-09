@@ -63,6 +63,24 @@ string ArrayToString(const T(&arr)[size])
 	return ss.str();
 }
 
+static constexpr double pi = 3.14159265;
+
+template<size_t size, typename T>
+string RotationArrayToString(const T(&arr)[size])
+{
+	auto ss = stringstream{};
+	ss << "(";
+	for (size_t i = 0; i < size; ++i)
+	{
+		ss << (180.0 * arr[i] / pi);
+		if (i < size - 1)
+			ss << ",";
+		else
+			ss << ")";
+	}
+	return ss.str();
+}
+
 template<size_t size, typename T>
 string ArrayToString(const T* arr)
 {
@@ -270,8 +288,6 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 #endif
 	}
 }
-
-static constexpr double pi = 3.14159265;
 
 void ExportBones(std::ostream& stream, const pmx::Model& model)
 {
@@ -594,15 +610,40 @@ void ExportRigidBodies(std::ostream& stream, const pmx::Model& model)
 		stream << endl;
 		stream << "-サイズ: " << RigidBodyShapeToSizeString(body.shape, body.size) << endl;
 		stream << "-位置: " << ArrayToString(body.position) << endl;
-		double rotation[3];
-		for (int i = 0; i < 3; ++i)
-			rotation[i] = 180.0 * body.orientation[i] / pi;
-		stream << "-回転: " << ArrayToString(rotation) << endl;
+		stream << "-回転: " << RotationArrayToString(body.orientation) << endl;
 		stream << "-質量: " << body.mass << endl;
 		stream << "-移動減衰: " << body.move_attenuation << endl;
 		stream << "-回転減衰: " << body.rotation_attenuation << endl;
 		stream << "-反発力: " << body.repulsion << endl;
 		stream << "-摩擦力: " << body.friction << endl;
+
+#ifdef _DEBUG
+		break;
+#endif
+	}
+}
+
+string RigidBodyIdxToString(int idx, const pmx::Model& model)
+{
+	if (0 <= idx && idx < model.rigid_bodies.size())
+		return ConcatJPENNames(model.rigid_bodies[idx].rigid_body_name, model.rigid_bodies[idx].rigid_body_english_name);
+	else
+		return "";
+}
+
+void ExportJoints(std::ostream& stream, const pmx::Model& model)
+{
+	for (auto& joint : model.joints)
+	{
+		stream << "ジョイント「" << ConcatJPENNames(joint.joint_name, joint.joint_english_name) << "」: " << endl;
+		stream << "-接続剛体A: " << RigidBodyIdxToString(joint.param.rigid_body1, model) << endl;
+		stream << "-接続剛体B: " << RigidBodyIdxToString(joint.param.rigid_body2, model) << endl;
+		stream << "-位置: " << ArrayToString(joint.param.position) << endl;
+		stream << "-回転: " << RotationArrayToString(joint.param.orientaiton) << endl;
+		stream << "-移動制限: " << ArrayToString(joint.param.move_limitation_min) << "-" << ArrayToString(joint.param.move_limitation_max) << endl;
+		stream << "-回転制限: " << RotationArrayToString(joint.param.rotation_limitation_min) << "-" << RotationArrayToString(joint.param.rotation_limitation_max) << endl;
+		stream << "-移動ばね: " << ArrayToString(joint.param.spring_move_coefficient) << endl;
+		stream << "-回転ばね: " << ArrayToString(joint.param.spring_rotation_coefficient) << endl;
 
 #ifdef _DEBUG
 		break;
@@ -621,4 +662,5 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportMorphs(stream, model);
 	ExportFrames(stream, model);
 	ExportRigidBodies(stream, model);
+	ExportJoints(stream, model);
 }
