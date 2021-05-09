@@ -1,12 +1,6 @@
 #include "pmx2txt/parser/Pmx.h"
 #include "pmx2txt/parser/Txt.h"
-#include <iostream>
 #include <fstream>
-#include <sstream>
-#include <iomanip>
-
-#define PRINT(x, y) std::cout << std::setw(24) << x << ":" \
-                            << std::setw(24) << std::right << y << std::endl;
 
 struct TooFewArguments : std::exception { };
 struct FileOpenError : std::exception { FileOpenError(const std::string& fileName) : fileName{ fileName } {} std::string fileName; };
