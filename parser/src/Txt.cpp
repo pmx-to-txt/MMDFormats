@@ -63,10 +63,23 @@ string ArrayToString(T(&arr)[size])
 	return ss.str();
 }
 
+string ConcatJPENNames(const string& jpName, const string& enName)
+{
+	auto ss = stringstream{};
+	ss << jpName;
+	if (enName.length() > 0)
+	{
+		ss << "(";
+		ss << enName;
+		ss << ")";
+	}
+	return ss.str();
+}
+
 string BoneIdxToString(int idx, const pmx::Model& model)
 {
 	if (0 <= idx && idx < model.bones.size())
-		return model.bones[idx].bone_name;
+		return ConcatJPENNames(model.bones[idx].bone_name, model.bones[idx].bone_english_name);
 	else
 		return "";
 }
@@ -159,19 +172,6 @@ void ExportFaces(std::ostream& stream, const pmx::Model& model, int offset, int 
 	}
 }
 
-string ConcatJPENNames(const string& jpName, const string& enName)
-{
-	auto ss = stringstream{};
-	ss << jpName;
-	if (enName.length() > 0)
-	{
-		ss << "(";
-		ss << enName;
-		ss << ")";
-	}
-	return ss.str();
-}
-
 string TextureIdxToString(int idx, const pmx::Model& model)
 {
 	if (0 <= idx && idx < model.textures.size())
@@ -203,6 +203,11 @@ string SphereModeToString(USphereMode sphereMode)
 	}
 }
 
+bool GetBit(int flags, int bit)
+{
+	return (flags & (0x1 << bit)) != 0;
+}
+
 void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 {
 	int curFaceIdx = 0;
@@ -213,11 +218,11 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 		float diffuse[3];
 		for (int j = 0; j < 3; ++j)
 			diffuse[j] = material.diffuse[j];
-		bool reversible = (material.flag & 0b00000001) >> 0;
-		bool groundShadow = (material.flag & 0b00000010) >> 1;
-		bool selfShadowMap = (material.flag & 0b00000100) >> 2;
-		bool selfShadow = (material.flag & 0b00001000) >> 3;
-		bool drawEdge = (material.flag & 0b00010000) >> 4;
+		bool reversible = GetBit(material.flag, 0);
+		bool groundShadow = GetBit(material.flag, 1);
+		bool selfShadowMap = GetBit(material.flag, 2);
+		bool selfShadow = GetBit(material.flag, 3);
+		bool drawEdge = GetBit(material.flag, 4);
 		auto textureFileName = TextureIdxToString(material.diffuse_texture_index, model);
 		auto sphereFileName = TextureIdxToString(material.sphere_texture_index, model);
 		auto toonFileName = material.common_toon_flag ? ToonIdxToString(material.toon_texture_index) : TextureIdxToString(material.toon_texture_index, model);
@@ -260,6 +265,85 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
+void ExportBones(std::ostream& stream, const pmx::Model& model)
+{
+	for (int i = 0; i < model.bones.size(); ++i)
+	{
+		auto& bone = model.bones[i];
+		bool tipBone = GetBit(bone.bone_flag, 0);
+		bool allowRotate = GetBit(bone.bone_flag, 1);
+		bool allowTrans = GetBit(bone.bone_flag, 2);
+		bool shown = GetBit(bone.bone_flag, 3);
+		bool allowControl = GetBit(bone.bone_flag, 4);
+		bool ik = GetBit(bone.bone_flag, 5);
+		bool localAppend = GetBit(bone.bone_flag, 7);
+		bool appendRotate = GetBit(bone.bone_flag, 8);
+		bool appendTrans = GetBit(bone.bone_flag, 9);
+		bool fixedAxis = GetBit(bone.bone_flag, 10);
+		bool localAxis = GetBit(bone.bone_flag, 11);
+		bool afterPhysic = GetBit(bone.bone_flag, 12);
+		bool externParent = GetBit(bone.bone_flag, 13);
+		stream << "ボーン「" << ConcatJPENNames(bone.bone_name, bone.bone_english_name) << "」: ";
+		if (allowRotate)
+			stream << "回転" << ",";
+		if (allowTrans)
+			stream << "移動" << ",";
+		if (shown)
+			stream << "表示" << ",";
+		if (allowControl)
+			stream << "操作" << ",";
+		stream << "位置" << ArrayToString(bone.position) << ",";
+		stream << "親ボーン「" << BoneIdxToString(bone.parent_index, model) << "」,";
+		if (tipBone)
+			stream << "表示先ボーン「" << BoneIdxToString(bone.target_index, model) << "」,";
+		else
+			stream << "表示先" << ArrayToString(bone.offset) << ",";
+		if (appendRotate || appendTrans)
+		{
+			if (appendRotate)
+				stream << "回転+" << ",";
+			if (appendTrans)
+				stream << "移動+" << ",";
+			stream << "付与率" << bone.grant_weight << ",";
+			if (localAppend)
+				stream << "ﾛｰｶﾙ付与" << ",";
+			stream << "付与親「" << BoneIdxToString(bone.grant_parent_index, model) << "」,";
+		}
+		if (fixedAxis)
+			stream << "軸制限" << ArrayToString(bone.lock_axis_orientation) << ",";
+		if (localAxis)
+		{
+			stream << "ﾛｰｶﾙ軸X" << ArrayToString(bone.local_axis_x_orientation) << ",";
+			stream << "ﾛｰｶﾙ軸Z" << ArrayToString(bone.local_axis_y_orientation) << ",";
+		}
+		if (externParent)
+			stream << "外部親Key" << bone.key << ",";
+		if (ik)
+		{
+			stream << "Target「" << BoneIdxToString(bone.ik_target_bone_index, model) << "」,";
+			stream << "Loop" << bone.ik_loop << ",";
+			stream << "単位角" << (180.0 * bone.ik_loop_angle_limit / 3.14159265) << ",";
+			for(size_t j = 0; j < bone.ik_links.size(); ++j)
+			{
+				auto& ik_link = bone.ik_links[j];
+				stream << "Link「" << BoneIdxToString(ik_link.link_target, model) << "」";
+				if (ik_link.angle_lock)
+				{
+					stream << ArrayToString(ik_link.min_radian) << "-" << ArrayToString(ik_link.max_radian);
+				}
+				stream << ",";
+			}
+		}
+		if (afterPhysic)
+			stream << "物理後" << ",";
+		stream << "変形階層" << bone.level << endl;
+
+#ifdef _DEBUG
+		break;
+#endif
+	}
+}
+
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 {
 	ExportVersion(stream, model);
@@ -267,4 +351,5 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportModelInfo(stream, model);
 	ExportVertices(stream, model);
 	ExportMaterials(stream, model);
+	ExportBones(stream, model);
 }
