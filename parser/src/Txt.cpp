@@ -271,6 +271,8 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
+static constexpr double pi = 3.14159265;
+
 void ExportBones(std::ostream& stream, const pmx::Model& model)
 {
 	for (int i = 0; i < model.bones.size(); ++i)
@@ -328,7 +330,7 @@ void ExportBones(std::ostream& stream, const pmx::Model& model)
 		{
 			stream << "Target「" << BoneIdxToString(bone.ik_target_bone_index, model) << "」,";
 			stream << "Loop" << bone.ik_loop << ",";
-			stream << "単位角" << (180.0 * bone.ik_loop_angle_limit / 3.14159265) << ",";
+			stream << "単位角" << (180.0 * bone.ik_loop_angle_limit / pi) << ",";
 			for (size_t j = 0; j < bone.ik_links.size(); ++j)
 			{
 				auto& ik_link = bone.ik_links[j];
@@ -507,15 +509,104 @@ void ExportFrames(std::ostream& stream, const pmx::Model& model)
 		stream << "表示枠「" << ConcatJPENNames(frame.frame_name, frame.frame_english_name) << "」: " << endl;
 		for (auto& element : frame.elements)
 		{
-			if(element.element_target == 0)
+			if (element.element_target == 0)
 				stream << "-ボーン「" << BoneIdxToString(element.index, model) << "」" << endl;
 			else
 				stream << "-モーフ「" << MorphIdxToString(element.index, model) << "」" << endl;
 
 #ifdef _DEBUG
-			//break;
+			break;
 #endif
 		}
+	}
+}
+
+using URigidBodyShape = uint8_t;
+struct UnknownRigidBodyShape : exception {};
+string RigidBodyShapeToString(URigidBodyShape shape)
+{
+	switch (shape)
+	{
+	case 0: return "球";
+	case 1: return "箱";
+	case 2: return "カプセル";
+	default: throw UnknownRigidBodyShape{};
+	}
+}
+
+string RigidBodyShapeToSizeString(URigidBodyShape shape, const float(&size)[3])
+{
+	stringstream ss;
+	switch (shape)
+	{
+	case 0:
+		ss << "半径" << size[0];
+		break;
+	case 1:
+		ss << "幅" << size[0] << "," << "高さ" << size[1] << "," << "奥行" << size[2];
+		break;
+	case 2:
+		ss << "半径" << size[0] << "," << "高さ" << size[1];
+		break;
+	default:
+		throw UnknownRigidBodyShape{};
+	}
+	return ss.str();
+}
+
+
+struct UnknownRigidBodyType : exception {};
+void ExportRigidBodies(std::ostream& stream, const pmx::Model& model)
+{
+	for (auto& body : model.rigid_bodies)
+	{
+		auto name = ConcatJPENNames(body.rigid_body_name, body.rigid_body_english_name);
+		switch (body.physics_calc_type)
+		{
+		case 0:
+			stream << "ボーン追従剛体「" << name << "」: " << endl;
+			break;
+		case 1:
+			stream << "物理演算剛体「" << name << "」: " << endl;
+			break;
+		case 2:
+			stream << "物理+ボーン位置合わせ剛体「" << name << "」: " << endl;
+			break;
+		default:
+			throw UnknownRigidBodyType{};
+		}
+		stream << "-関連ボーン: " << BoneIdxToString(body.target_bone, model) << endl;
+		stream << "-形状: " << RigidBodyShapeToString(body.shape) << endl;
+		stream << "-グループ: " << static_cast<int>(body.group + 1) << endl;
+		stream << "-非衝突グループ: ";
+		bool first = true;
+		for (int i = 0; i < 16; ++i)
+		{
+			if (!GetBit(body.mask, i))
+			{
+				if (first)
+					first = false;
+				else
+					stream << ",";
+				stream << (i + 1);
+			}
+		}
+		stream << endl;
+		stream << "-サイズ: " << RigidBodyShapeToSizeString(body.shape, body.size) << endl;
+		stream << "-位置: " << ArrayToString(body.position) << endl;
+		double rotation[3];
+		for (int i = 0; i < 3; ++i)
+			rotation[i] = 180.0 * body.orientation[i] / pi;
+		stream << "-回転: " << ArrayToString(rotation) << endl;
+		stream << "-質量: " << body.mass << endl;
+		stream << "-移動減衰: " << body.move_attenuation << endl;
+		stream << "-回転減衰: " << body.rotation_attenuation << endl;
+		stream << "-反発力: " << body.repulsion << endl;
+		stream << "-摩擦力: " << body.friction << endl;
+
+#ifdef _DEBUG
+		break;
+#endif
 	}
 }
 
@@ -529,4 +620,5 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportBones(stream, model);
 	ExportMorphs(stream, model);
 	ExportFrames(stream, model);
+	ExportRigidBodies(stream, model);
 }
