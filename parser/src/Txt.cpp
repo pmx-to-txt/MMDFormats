@@ -36,11 +36,15 @@ void ExportModelInfo(std::ostream& stream, const pmx::Model& model)
 	stream << "----------------" << endl;
 	stream << model.model_comment << endl;
 	stream << "----------------" << endl;
-	stream << "モデル名(英): " << model.model_english_name << endl;
-	stream << "コメント(英): " << endl;
-	stream << "----------------" << endl;
-	stream << model.model_english_comment << endl;
-	stream << "----------------" << endl;
+	if (model.model_english_name.length() > 0)
+		stream << "モデル名(英): " << model.model_english_name << endl;
+	if (model.model_english_comment.length() > 0)
+	{
+		stream << "コメント(英): " << endl;
+		stream << "----------------" << endl;
+		stream << model.model_english_comment << endl;
+		stream << "----------------" << endl;
+	}
 }
 
 template<typename T, size_t size>
@@ -126,7 +130,7 @@ void ExportVertices(std::ostream& stream, const pmx::Model& model)
 		stream << "頂点" << i << ": ";
 		stream << "位置" << ArrayToString(vertex.positon) << ",";
 		stream << "法線" << ArrayToString(vertex.normal) << ",";
-		stream << "エッジ倍率(" << vertex.edge << "),";
+		stream << "エッジ倍率" << vertex.edge << ",";
 		stream << "UV" << ArrayToString(vertex.uv) << ",";
 		for (size_t j = 0; j < model.setting.uv; ++j)
 			stream << "追加UV" << (j + 1) << ArrayToString(vertex.uva[j]) << ",";
@@ -137,16 +141,44 @@ void ExportVertices(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
-void ExportFaces(std::ostream& stream, const pmx::Model& model)
+void ExportFaces(std::ostream& stream, const pmx::Model& model, int offset, int num)
 {
-	for (int i = 0; i < (model.indices.size() / 3); ++i)
+	for (int i = offset; i < offset + num; ++i)
 	{
 		int indices[3];
 		for (int j = 0; j < 3; ++j)
 			indices[j] = model.indices[static_cast<int64_t>(i) * 3 + j];
-		stream << "面" << i << ": " << ArrayToString(indices);
+		stream << ArrayToString(indices);
 		stream << endl;
 
+		break;
+	}
+}
+
+string ConcatJPENNames(const string& jpName, const string& enName)
+{
+	auto ss = stringstream{};
+	ss << jpName;
+	if (enName.length() > 0)
+	{
+		ss << "(";
+		ss << enName;
+		ss << ")";
+	}
+	return ss.str();
+}
+
+void ExportMaterials(std::ostream& stream, const pmx::Model& model)
+{
+	int curFaceIdx = 0;
+	for (int i = 0; i < model.materials.size(); ++i)
+	{
+		auto& material = model.materials[i];
+		int numFaces = material.index_count / 3;
+		stream << "材質「" << ConcatJPENNames(material.material_name, material.material_english_name) << "」: ";
+		stream << endl;
+		ExportFaces(stream, model, curFaceIdx, numFaces);
+		curFaceIdx += numFaces;
 		break;
 	}
 }
@@ -157,5 +189,5 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportSetting(stream, model);
 	ExportModelInfo(stream, model);
 	ExportVertices(stream, model);
-	ExportFaces(stream, model);
+	ExportMaterials(stream, model);
 }
