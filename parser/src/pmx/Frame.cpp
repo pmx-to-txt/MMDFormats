@@ -73,7 +73,7 @@ std::size_t pmx::Frame::dump(std::ostream& stream)
 
 	for (int i = 0; i < this->element_count; i++)
 	{
-		total += this->elements[i].dump(stream);
+		total += this->elements.at(i).dump(stream);
 	}
 	return total;
 }

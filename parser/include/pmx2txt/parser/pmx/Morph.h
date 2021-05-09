@@ -1,10 +1,9 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <fstream>
-#include <memory>
 
 #include "pmx2txt/parser/pmx/enum.h"
 #include "pmx2txt/parser/pmx/Setting.h"
@@ -25,7 +24,7 @@ namespace pmx
 	{
 	public:
 		int vertex_index;
-		float position_offset[3];
+		std::array<float,3> position_offset;
 
 	public:
 		MorphVertexOffset(const pmx::Setting& setting_) noexcept;
@@ -37,7 +36,7 @@ namespace pmx
 	{
 	public:
 		int vertex_index;
-		float uv_offset[4];
+		std::array<float, 4> uv_offset;
 
 	public:
 		MorphUVOffset(const pmx::Setting& setting_) noexcept;
@@ -49,8 +48,8 @@ namespace pmx
 	{
 	public:
 		int bone_index;
-		float translation[3];
-		float rotation[4];
+		std::array<float, 3> translation;
+		std::array<float, 4> rotation;
 
 	public:
 		MorphBoneOffset(const pmx::Setting& setting_) noexcept;
@@ -63,15 +62,15 @@ namespace pmx
 	public:
 		int material_index = -1;
 		uint8_t offset_operation = -1;
-		float diffuse[4];
-		float specular[3];
+		std::array<float, 4> diffuse;
+		std::array<float, 3> specular;
 		float specularity;
-		float ambient[3];
-		float edge_color[4];
+		std::array<float, 3> ambient;
+		std::array<float, 4> edge_color;
 		float edge_size;
-		float texture_argb[4];
-		float sphere_texture_argb[4];
-		float toon_texture_argb[4];
+		std::array<float, 4> texture_argb;
+		std::array<float, 4> sphere_texture_argb;
+		std::array<float, 4> toon_texture_argb;
 
 	public:
 		MorphMaterialOffset(const pmx::Setting& setting_)noexcept;
@@ -108,8 +107,8 @@ namespace pmx
 	public:
 		int rigid_body_index;
 		uint8_t is_local;
-		float velocity[3];
-		float angular_torque[3];
+		std::array<float, 3> velocity;
+		std::array<float, 3> angular_torque;
 
 	public:
 		MorphImpulseOffset(const pmx::Setting& setting_) noexcept;
@@ -128,9 +127,9 @@ namespace pmx
 		/// モーフ英名
 		std::string morph_english_name;
 		/// カテゴリ
-		MorphCategory category = static_cast<MorphCategory>(-1);
+		MorphCategory category;
 		/// モーフタイプ
-		MorphType morph_type = static_cast<MorphType>(-1);
+		MorphType morph_type;
 		/// オフセット数
 		int offset_count;
 		/// 頂点モーフ配列

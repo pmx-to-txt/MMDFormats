@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <iostream>
 
 #include "pmx2txt/parser/pmx/Setting.h"
@@ -64,9 +65,9 @@ namespace pmx
 		int bone_index1;
 		int bone_index2;
 		float bone_weight;
-		float sdef_c[3];
-		float sdef_r0[3];
-		float sdef_r1[3];
+		std::array<float,3> sdef_c;
+		std::array<float, 3> sdef_r0;
+		std::array<float, 3> sdef_r1;
 
 	public:
 		VertexSkinningSDEF(const pmx::Setting& setting_) noexcept;

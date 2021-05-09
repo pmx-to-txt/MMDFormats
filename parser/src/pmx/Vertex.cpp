@@ -9,27 +9,23 @@
 pmx::Vertex::Vertex(const pmx::Setting& setting_) noexcept
 	: setting(setting_)
 	, edge(0.0f)
+	, positon({ 0.0f,0.0f, 0.0f, })
+	, normal({ 0.0f,0.0f, 0.0f, })
+	, uv({ 0.0f,0.0f, })
+	, uva({ std::array<float, 4>{0.0f} })
+	, skinning_type(pmx::VertexSkinningType::BDEF1)
+	, skinning(nullptr)
 {
-	uv[0] = uv[1] = 0.0f;
-	for (int i = 0; i < 3; ++i) {
-		positon[i] = 0.0f;
-		normal[i] = 0.0f;
-	}
-	for (int i = 0; i < 4; ++i) {
-		for (int k = 0; k < 4; ++k) {
-			uva[i][k] = 0.0f;
-		}
-	}
 }
 
 void pmx::Vertex::parse(std::istream& stream)
 {
-	stream.read((char*)this->positon, sizeof(float) * 3);
-	stream.read((char*)this->normal, sizeof(float) * 3);
-	stream.read((char*)this->uv, sizeof(float) * 2);
+	stream.read(static_cast<char*>(static_cast<void*>(this->positon.data())), sizeof(float) * this->positon.size());
+	stream.read(static_cast<char*>(static_cast<void*>(this->normal.data())), sizeof(float) * this->normal.size());
+	stream.read(static_cast<char*>(static_cast<void*>(this->uv.data())), sizeof(float) * this->uv.size());
 	for (int i = 0; i < this->setting.uv; ++i)
 	{
-		stream.read((char*)this->uva[i], sizeof(float) * 4);
+		stream.read(static_cast<char*>(static_cast<void*>(this->uva.at(i).data())), sizeof(float) * this->uva.at(i).size());
 	}
 	stream.read((char*)&this->skinning_type, sizeof(pmx::VertexSkinningType));
 	switch (this->skinning_type)
@@ -64,13 +60,13 @@ void pmx::Vertex::parse(std::istream& stream)
 std::size_t pmx::Vertex::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
-	stream.write(static_cast<char*>(static_cast<void*>(this->positon)), sizeof(float) * 3);
-	stream.write(static_cast<char*>(static_cast<void*>(this->normal)), sizeof(float) * 3);
-	stream.write(static_cast<char*>(static_cast<void*>(this->uv)), sizeof(float) * 2);
+	stream.write(static_cast<char*>(static_cast<void*>(this->positon.data())), sizeof(float) * this->positon.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->normal.data())), sizeof(float) * this->normal.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->uv.data())), sizeof(float) * this->uv.size());
 	total += sizeof(float) * 8;
 	for (uint8_t i = 0; i < this->setting.uv; ++i)
 	{
-		stream.write(static_cast<char*>(static_cast<void*>(this->uva[i])), sizeof(float) * 4);
+		stream.write(static_cast<char*>(static_cast<void*>(this->uva.at(i).data())), sizeof(float) * this->uva.at(i).size());
 		total += sizeof(float) * 4;
 	}
 	stream.write(static_cast<char*>(static_cast<void*>(&this->skinning_type)), sizeof(pmx::VertexSkinningType));

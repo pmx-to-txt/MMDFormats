@@ -21,7 +21,7 @@ namespace pmx
 		int target_material;
 		uint8_t group;
 		uint16_t mask;
-		SoftBodyFlag flag{ pmx::SoftBodyFlag::BLink };
+		SoftBodyFlag flag;
 		int blink_distance;
 		int cluster_count;
 		float mass;

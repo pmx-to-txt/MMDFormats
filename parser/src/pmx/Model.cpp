@@ -1,3 +1,4 @@
+#include <array>
 #include <stdexcept>
 #include <utility>
 
@@ -6,12 +7,12 @@
 #include "pmx2txt/parser/pmx/util.h"
 
 pmx::Model::Model() noexcept
-	: version{ 0.0f }
-	, setting{}
-	, model_name{ "" }
-	, model_english_name{ "" }
-	, model_comment{ "" }
-	, model_english_comment{ "" }
+	: version( 0.0f)
+	, setting()
+	, model_name()
+	, model_english_name()
+	, model_comment()
+	, model_english_comment()
 	, vertices()
 	, indices()
 	, textures()
@@ -27,9 +28,9 @@ pmx::Model::Model() noexcept
 void pmx::Model::parse(std::istream& stream)
 {
 	// マジック
-	char magic[4]{};
-	stream.read((char*)magic, sizeof(char) * 4);
-	if (magic[0] != 0x50 || magic[1] != 0x4d || magic[2] != 0x58 || magic[3] != 0x20)
+	std::array<char, 4> magic{0};
+	stream.read((char*)magic.data(), sizeof(char) * magic.size());
+	if (magic.at(0) != 0x50 || magic.at(1) != 0x4d || magic.at(2) != 0x58 || magic.at(3) != 0x20)
 	{
 		std::cerr << "invalid magic number." << std::endl;
 		throw;
@@ -165,8 +166,8 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
 	// マジック
-	constexpr char magic[4] = { 0x50, 0x4d, 0x58, 0x20 };
-	stream.write(magic, sizeof(char) * 4);
+	constexpr std::array<char, 4> magic = { 0x50, 0x4d, 0x58, 0x20 };
+	stream.write(magic.data(), sizeof(char) * 4);
 	total += sizeof(char) * 4;
 
 
