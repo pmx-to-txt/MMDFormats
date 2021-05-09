@@ -66,7 +66,7 @@ string ArrayToString(const T(&arr)[size])
 static constexpr double pi = 3.14159265;
 
 template<size_t size, typename T>
-string RotationArrayToString(const T(&arr)[size])
+string RotationArrayToString(const array<T, size>& arr)
 {
 	auto ss = stringstream{};
 	ss << "(";
@@ -88,6 +88,18 @@ string ArrayToString(const T* arr)
 	for (int j = 0; j < size; ++j)
 		buf[j] = arr[j];
 	return ArrayToString(buf);
+}
+
+template<size_t size, typename T>
+string ArrayToString(const array<T, size>& arr)
+{
+	return ArrayToString<size>(arr.data());
+}
+
+template<size_t size, size_t size2, typename T>
+string ArrayToString(const array<T, size2>& arr)
+{
+	return ArrayToString<size>(arr.data());
 }
 
 string ConcatJPENNames(const string& jpName, const string& enName)
@@ -550,7 +562,7 @@ string RigidBodyShapeToString(URigidBodyShape shape)
 	}
 }
 
-string RigidBodyShapeToSizeString(URigidBodyShape shape, const float(&size)[3])
+string RigidBodyShapeToSizeString(URigidBodyShape shape, const array<float, 3> &size)
 {
 	stringstream ss;
 	switch (shape)
