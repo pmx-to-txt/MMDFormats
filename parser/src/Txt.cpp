@@ -168,6 +168,37 @@ string ConcatJPENNames(const string& jpName, const string& enName)
 	return ss.str();
 }
 
+string TextureIdxToString(int idx, const pmx::Model& model)
+{
+	if (0 <= idx && idx < model.textures.size())
+		return model.textures[idx];
+	else
+		return "";
+}
+
+string ToonIdxToString(int idx)
+{
+	auto ss = stringstream{};
+	ss << "toon";
+	ss << std::setfill('0') << std::right << std::setw(2) << (idx + 1);
+	ss << ".bmp";
+	return ss.str();
+}
+
+using USphereMode = uint8_t;
+struct UnknownSphereMode : exception {};
+string SphereModeToString(USphereMode sphereMode)
+{
+	switch (sphereMode)
+	{
+	case 0: return "ｽﾌｨｱ無効";
+	case 1: return "乗算ｽﾌｨｱ";
+	case 2: return "加算ｽﾌｨｱ";
+	case 3: return "サブTex";
+	default: throw UnknownSphereMode{};
+	}
+}
+
 void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 {
 	int curFaceIdx = 0;
@@ -175,8 +206,47 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 	{
 		auto& material = model.materials[i];
 		int numFaces = material.index_count / 3;
+		float diffuse[3];
+		for (int j = 0; j < 3; ++j)
+			diffuse[j] = material.diffuse[j];
+		bool reversible = (material.flag & 0b00000001) >> 0;
+		bool groundShadow = (material.flag & 0b00000010) >> 1;
+		bool selfShadowMap = (material.flag & 0b00000100) >> 2;
+		bool selfShadow = (material.flag & 0b00001000) >> 3;
+		bool drawEdge = (material.flag & 0b00010000) >> 4;
+		auto textureFileName = TextureIdxToString(material.diffuse_texture_index, model);
+		auto sphereFileName = TextureIdxToString(material.sphere_texture_index, model);
+		auto toonFileName = material.common_toon_flag ? ToonIdxToString(material.toon_texture_index) : TextureIdxToString(material.toon_texture_index, model);
 		stream << "材質「" << ConcatJPENNames(material.material_name, material.material_english_name) << "」: ";
-		stream << endl;
+		stream << "拡散色" << ArrayToString(diffuse) << ",";
+		stream << "反射色" << ArrayToString(material.specular) << ",";
+		stream << "環境色" << ArrayToString(material.ambient) << ",";
+		stream << "非透過度" << material.diffuse[3] << ",";
+		stream << "反射強度" << material.specularlity << ",";
+		if (reversible)
+			stream << "両面描画" << ",";
+		if (groundShadow)
+			stream << "地面影" << ",";
+		if (selfShadowMap)
+			stream << "ｾﾙﾌ影ﾏｯﾌﾟ" << ",";
+		if (selfShadow)
+			stream << "ｾﾙﾌ影" << ",";
+		stream << "エッジ" << (drawEdge ? "有効" : "無効") << ",";
+		stream << "エッジサイズ" << material.edge_size << ",";
+		stream << "エッジ色" << ArrayToString(material.edge_color) << ",";
+		if (textureFileName.length() > 0)
+			stream << "Tex「" << textureFileName << "」,";
+		if (toonFileName.length() > 0)
+			stream << "Toon「" << toonFileName << "」,";
+		if (sphereFileName.length() > 0)
+			stream << "ｽﾌｨｱ「" << sphereFileName << "」,";
+		stream << SphereModeToString(material.sphere_op_mode) << endl;
+		if (material.memo.length() > 0)
+		{
+			stream << "----------------" << endl;
+			stream << material.memo << endl;
+			stream << "----------------" << endl;
+		}
 		ExportFaces(stream, model, curFaceIdx, numFaces);
 		curFaceIdx += numFaces;
 		break;
