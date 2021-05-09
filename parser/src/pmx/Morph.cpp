@@ -28,7 +28,7 @@ std::size_t pmx::MorphVertexOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->vertex_index, this->setting.vertex_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->position_offset)), sizeof(float) * 3);
+	stream.write(static_cast<char*>(static_cast<void*>(this->position_offset.data())), sizeof(float) * this->position_offset.size());
 	total += sizeof(float) * 3;
 	return total;
 }
@@ -50,7 +50,7 @@ std::size_t pmx::MorphUVOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->vertex_index, this->setting.vertex_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->uv_offset)), sizeof(float) * 4);
+	stream.write(static_cast<char*>(static_cast<void*>(this->uv_offset.data())), sizeof(float) * this->uv_offset.size());
 	total += sizeof(float) * 4;
 	return total;
 }
@@ -74,8 +74,8 @@ std::size_t pmx::MorphBoneOffset::dump(std::ostream& stream)
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->bone_index, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->translation)), sizeof(float) * 3);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->rotation)), sizeof(float) * 4);
+	stream.write(static_cast<char*>(static_cast<void*>(this->translation.data())), sizeof(float) * this->translation.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->rotation.data())), sizeof(float) * this->rotation.size());
 	total += sizeof(float) * 7;
 	return total;
 }
@@ -116,15 +116,15 @@ std::size_t pmx::MorphMaterialOffset::dump(std::ostream& stream)
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->material_index, this->setting.material_index_size);
 	stream.write(static_cast<char*>(static_cast<void*>(&this->offset_operation)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->diffuse)), sizeof(float) * 4);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->specular)), sizeof(float) * 3);
+	stream.write(static_cast<char*>(static_cast<void*>(this->diffuse.data())), sizeof(float) * this->diffuse.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->specular.data())), sizeof(float) * this->specular.size());
 	stream.write(static_cast<char*>(static_cast<void*>(&this->specularity)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->ambient)), sizeof(float) * 3);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->edge_color)), sizeof(float) * 4);
+	stream.write(static_cast<char*>(static_cast<void*>(this->ambient.data())), sizeof(float) * this->ambient.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->edge_color.data())), sizeof(float) * this->edge_color.size());
 	stream.write(static_cast<char*>(static_cast<void*>(&this->edge_size)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->texture_argb)), sizeof(float) * 4);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->sphere_texture_argb)), sizeof(float) * 4);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->toon_texture_argb)), sizeof(float) * 4);
+	stream.write(static_cast<char*>(static_cast<void*>(this->texture_argb.data())), sizeof(float) * this->texture_argb.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->sphere_texture_argb.data())), sizeof(float) * this->sphere_texture_argb.size());
+	stream.write(static_cast<char*>(static_cast<void*>(this->toon_texture_argb.data())), sizeof(float) * this->toon_texture_argb.size());
 	total += sizeof(float) * 28;
 	return total;
 }
