@@ -44,25 +44,25 @@ void pmx::RigidBody::parse(std::istream& stream)
 	stream.read((char*)&this->physics_calc_type, sizeof(uint8_t));
 }
 
-std::size_t pmx::RigidBody::dump(std::ostream& stream)
+std::size_t pmx::RigidBody::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpString(stream, this->rigid_body_name, this->setting.encoding);
 	total += pmx::util::dumpString(stream, this->rigid_body_english_name, this->setting.encoding);
 	total += pmx::util::dumpIndex(stream, this->target_bone, this->setting.bone_index_size);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->group)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->mask)), sizeof(uint16_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->shape)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(this->size.data())), sizeof(float) * this->size.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->position.data())), sizeof(float) * this->position.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->orientation.data())), sizeof(float) * this->orientation.size());
-	stream.write(static_cast<char*>(static_cast<void*>(&this->mass)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->move_attenuation)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->rotation_attenuation)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->repulsion)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->friction)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->physics_calc_type)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->group)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->mask)), sizeof(uint16_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->shape)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->size.data())), sizeof(float) * this->size.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->position.data())), sizeof(float) * this->position.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->orientation.data())), sizeof(float) * this->orientation.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->mass)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->move_attenuation)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->rotation_attenuation)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->repulsion)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->friction)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->physics_calc_type)), sizeof(uint8_t));
 
 	total += sizeof(float) * 14 + sizeof(uint16_t) + sizeof(uint8_t) * 3;
 	return total;

@@ -51,34 +51,34 @@ void pmx::Material::parse(std::istream& stream)
 	stream.read((char*)&this->index_count, sizeof(int));
 }
 
-std::size_t pmx::Material::dump(std::ostream& stream)
+std::size_t pmx::Material::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpString(stream, this->material_name, this->setting.encoding);
 	total += pmx::util::dumpString(stream, this->material_english_name, this->setting.encoding);
-	stream.write(static_cast<char*>(static_cast<void*>(this->diffuse.data())), sizeof(float) * this->diffuse.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->specular.data())), sizeof(float) * this->specular.size());
-	stream.write(static_cast<char*>(static_cast<void*>(&this->specularlity)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(this->ambient.data())), sizeof(float) * this->ambient.size());
-	stream.write(static_cast<char*>(static_cast<void*>(&this->flag)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(this->edge_color.data())), sizeof(float) * this->edge_color.size());
-	stream.write(static_cast<char*>(static_cast<void*>(&this->edge_size)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->diffuse.data())), sizeof(float) * this->diffuse.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->specular.data())), sizeof(float) * this->specular.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->specularlity)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->ambient.data())), sizeof(float) * this->ambient.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->flag)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->edge_color.data())), sizeof(float) * this->edge_color.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->edge_size)), sizeof(float));
 	total += sizeof(float) * 16 + sizeof(uint8_t);
 	total += pmx::util::dumpIndex(stream, this->diffuse_texture_index, this->setting.texture_index_size);
 	total += pmx::util::dumpIndex(stream, this->sphere_texture_index, this->setting.texture_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->sphere_op_mode)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->common_toon_flag)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->sphere_op_mode)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->common_toon_flag)), sizeof(uint8_t));
 	total += sizeof(uint8_t) * 2;
 	if (this->common_toon_flag)
 	{
-		stream.write(static_cast<char*>(static_cast<void*>(&this->toon_texture_index)), sizeof(uint8_t));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&this->toon_texture_index)), sizeof(uint8_t));
 		total += sizeof(uint8_t);
 	}
 	else {
 		total += pmx::util::dumpIndex(stream, this->toon_texture_index, this->setting.texture_index_size);
 	}
 	total += pmx::util::dumpString(stream, this->memo, this->setting.encoding);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->index_count)), sizeof(int));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->index_count)), sizeof(int));
 	total += sizeof(int);
 	return total;
 }

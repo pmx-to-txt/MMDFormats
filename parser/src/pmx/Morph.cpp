@@ -24,11 +24,11 @@ void pmx::MorphVertexOffset::parse(std::istream& stream)
 	stream.read((char*)this->position_offset.data(), sizeof(float) * this->position_offset.size());
 }
 
-std::size_t pmx::MorphVertexOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphVertexOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->vertex_index, this->setting.vertex_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(this->position_offset.data())), sizeof(float) * this->position_offset.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->position_offset.data())), sizeof(float) * this->position_offset.size());
 	total += sizeof(float) * 3;
 	return total;
 }
@@ -46,11 +46,11 @@ void pmx::MorphUVOffset::parse(std::istream& stream)
 	stream.read((char*)this->uv_offset.data(), sizeof(float) * this->uv_offset.size());
 }
 
-std::size_t pmx::MorphUVOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphUVOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->vertex_index, this->setting.vertex_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(this->uv_offset.data())), sizeof(float) * this->uv_offset.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->uv_offset.data())), sizeof(float) * this->uv_offset.size());
 	total += sizeof(float) * 4;
 	return total;
 }
@@ -70,12 +70,12 @@ void pmx::MorphBoneOffset::parse(std::istream& stream)
 	stream.read((char*)this->rotation.data(), sizeof(float) * this->rotation.size());
 }
 
-std::size_t pmx::MorphBoneOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphBoneOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->bone_index, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(this->translation.data())), sizeof(float) * this->translation.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->rotation.data())), sizeof(float) * this->rotation.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->translation.data())), sizeof(float) * this->translation.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->rotation.data())), sizeof(float) * this->rotation.size());
 	total += sizeof(float) * 7;
 	return total;
 }
@@ -111,20 +111,20 @@ void pmx::MorphMaterialOffset::parse(std::istream& stream)
 	stream.read((char*)this->toon_texture_argb.data(), sizeof(float) * this->toon_texture_argb.size());
 }
 
-std::size_t pmx::MorphMaterialOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphMaterialOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->material_index, this->setting.material_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->offset_operation)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(this->diffuse.data())), sizeof(float) * this->diffuse.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->specular.data())), sizeof(float) * this->specular.size());
-	stream.write(static_cast<char*>(static_cast<void*>(&this->specularity)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(this->ambient.data())), sizeof(float) * this->ambient.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->edge_color.data())), sizeof(float) * this->edge_color.size());
-	stream.write(static_cast<char*>(static_cast<void*>(&this->edge_size)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(this->texture_argb.data())), sizeof(float) * this->texture_argb.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->sphere_texture_argb.data())), sizeof(float) * this->sphere_texture_argb.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->toon_texture_argb.data())), sizeof(float) * this->toon_texture_argb.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->offset_operation)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->diffuse.data())), sizeof(float) * this->diffuse.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->specular.data())), sizeof(float) * this->specular.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->specularity)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->ambient.data())), sizeof(float) * this->ambient.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->edge_color.data())), sizeof(float) * this->edge_color.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->edge_size)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->texture_argb.data())), sizeof(float) * this->texture_argb.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->sphere_texture_argb.data())), sizeof(float) * this->sphere_texture_argb.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->toon_texture_argb.data())), sizeof(float) * this->toon_texture_argb.size());
 	total += sizeof(float) * 28;
 	return total;
 }
@@ -141,11 +141,11 @@ void pmx::MorphGroupOffset::parse(std::istream& stream)
 	stream.read((char*)&this->morph_weight, sizeof(float));
 }
 
-std::size_t pmx::MorphGroupOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphGroupOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->morph_index, this->setting.morph_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->morph_weight)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->morph_weight)), sizeof(float));
 	total += sizeof(float);
 	return total;
 }
@@ -162,11 +162,11 @@ void pmx::MorphFlipOffset::parse(std::istream& stream)
 	stream.read((char*)&this->morph_value, sizeof(float));
 }
 
-std::size_t pmx::MorphFlipOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphFlipOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->morph_index, this->setting.morph_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->morph_value)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->morph_value)), sizeof(float));
 	total += sizeof(float);
 	return total;
 }
@@ -188,13 +188,13 @@ void pmx::MorphImpulseOffset::parse(std::istream& stream)
 	stream.read((char*)this->angular_torque.data(), sizeof(float) * this->angular_torque.size());
 }
 
-std::size_t pmx::MorphImpulseOffset::dump(std::ostream& stream)
+std::size_t pmx::MorphImpulseOffset::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->rigid_body_index, this->setting.rigidbody_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->is_local)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(this->velocity.data())), sizeof(float) * this->velocity.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->angular_torque.data())), sizeof(float) * this->angular_torque.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->is_local)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->velocity.data())), sizeof(float) * this->velocity.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->angular_torque.data())), sizeof(float) * this->angular_torque.size());
 	total += sizeof(float) * 6 + sizeof(uint8_t);
 	return total;
 }
@@ -269,20 +269,20 @@ void pmx::Morph::parse(std::istream& stream)
 	}
 }
 
-std::size_t pmx::Morph::dump(std::ostream& stream)
+std::size_t pmx::Morph::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpString(stream, this->morph_name, this->setting.encoding);
 	total += pmx::util::dumpString(stream, this->morph_english_name, this->setting.encoding);
 
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->category)), sizeof(MorphCategory));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->category)), sizeof(MorphCategory));
 	total += sizeof(MorphCategory);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->morph_type)), sizeof(MorphType));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->morph_type)), sizeof(MorphType));
 	total += sizeof(MorphType);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->offset_count)), sizeof(int));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->offset_count)), sizeof(int));
 	total += sizeof(int);
 
 	switch (this->morph_type)

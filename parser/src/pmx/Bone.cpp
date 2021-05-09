@@ -68,58 +68,58 @@ void pmx::Bone::parse(std::istream& stream)
 	}
 }
 
-std::size_t pmx::Bone::dump(std::ostream& stream)
+std::size_t pmx::Bone::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpString(stream, this->bone_name, this->setting.encoding);
 	total += pmx::util::dumpString(stream, this->bone_english_name, this->setting.encoding);
 
-	stream.write(static_cast<char*>(static_cast<void*>(this->position.data())), sizeof(float) * this->position.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->position.data())), sizeof(float) * this->position.size());
 	total += sizeof(float) * 3;
 
 	total += pmx::util::dumpIndex(stream, this->parent_index, this->setting.bone_index_size);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->level)), sizeof(int));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->level)), sizeof(int));
 	total += sizeof(int);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_flag)), sizeof(uint16_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_flag)), sizeof(uint16_t));
 	total += sizeof(uint16_t);
 
 	if (this->bone_flag & 0x0001) {
 		total += pmx::util::dumpIndex(stream, this->target_index, this->setting.bone_index_size);
 	}
 	else {
-		stream.write(static_cast<char*>(static_cast<void*>(this->offset.data())), sizeof(float) * this->offset.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(this->offset.data())), sizeof(float) * this->offset.size());
 		total += sizeof(float) * 3;
 	}
 	if (this->bone_flag & (0x0100 | 0x0200)) {
 		total += pmx::util::dumpIndex(stream, this->grant_parent_index, this->setting.bone_index_size);
-		stream.write(static_cast<char*>(static_cast<void*>(&this->grant_weight)), sizeof(float));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&this->grant_weight)), sizeof(float));
 		total += sizeof(float);
 	}
 	if (this->bone_flag & 0x0400) {
-		stream.write(static_cast<char*>(static_cast<void*>(this->lock_axis_orientation.data())), sizeof(float) * this->lock_axis_orientation.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(this->lock_axis_orientation.data())), sizeof(float) * this->lock_axis_orientation.size());
 		total += sizeof(float) * 3;
 	}
 	if (this->bone_flag & 0x0800) {
-		stream.write(static_cast<char*>(static_cast<void*>(this->local_axis_x_orientation.data())), sizeof(float) * this->local_axis_x_orientation.size());
-		stream.write(static_cast<char*>(static_cast<void*>(this->local_axis_y_orientation.data())), sizeof(float) * this->local_axis_y_orientation.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(this->local_axis_x_orientation.data())), sizeof(float) * this->local_axis_x_orientation.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(this->local_axis_y_orientation.data())), sizeof(float) * this->local_axis_y_orientation.size());
 		total += sizeof(float) * 6;
 	}
 	if (this->bone_flag & 0x2000) {
-		stream.write(static_cast<char*>(static_cast<void*>(&this->key)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&this->key)), sizeof(int));
 		total += sizeof(int);
 	}
 	if (this->bone_flag & 0x0020) {
 		total += pmx::util::dumpIndex(stream, this->ik_target_bone_index, this->setting.bone_index_size);
 
-		stream.write(static_cast<char*>(static_cast<void*>(&this->ik_loop)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&this->ik_loop)), sizeof(int));
 		total += sizeof(int);
 
-		stream.write(static_cast<char*>(static_cast<void*>(&this->ik_loop_angle_limit)), sizeof(float));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&this->ik_loop_angle_limit)), sizeof(float));
 		total += sizeof(float);
 
-		stream.write(static_cast<char*>(static_cast<void*>(&this->ik_link_count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&this->ik_link_count)), sizeof(int));
 		total += sizeof(int);
 
 		for (int i = 0; i < this->ik_link_count; i++) {

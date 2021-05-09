@@ -162,7 +162,7 @@ void pmx::Model::parse(std::istream& stream)
 	//}
 }
 
-std::size_t pmx::Model::dump(std::ostream& stream)
+std::size_t pmx::Model::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	// マジック
@@ -172,7 +172,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 
 
 	// バージョン
-	stream.write(static_cast<char*>(static_cast<void*>(&this->version)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->version)), sizeof(float));
 	total += sizeof(float);
 
 	// ファイル設定
@@ -187,7 +187,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// 頂点
 	{
 		int count = this->vertices.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -199,7 +199,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// 面
 	{
 		int count = this->indices.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -211,7 +211,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// テクスチャ
 	{
 		int count = this->textures.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -223,7 +223,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// マテリアル
 	{
 		int count = this->materials.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -235,7 +235,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// ボーン
 	{
 		int count = this->bones.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -247,7 +247,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// モーフ
 	{
 		int count = this->morphs.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -259,7 +259,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// 表示枠
 	{
 		int count = this->frames.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -271,7 +271,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// 剛体
 	{
 		int count = this->rigid_bodies.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 
@@ -283,7 +283,7 @@ std::size_t pmx::Model::dump(std::ostream& stream)
 	// ジョイント
 	{
 		int count = this->joints.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&count)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(&count)), sizeof(int));
 		total += sizeof(int);
 	}
 

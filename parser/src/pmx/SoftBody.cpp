@@ -56,7 +56,7 @@ void pmx::SoftBody::parse(std::istream& stream)
 	throw std::runtime_error("Not Implemented Exception");
 }
 
-std::size_t pmx::SoftBody::dump(std::ostream& stream)
+std::size_t pmx::SoftBody::dump(std::ostream& stream) const
 {
 	throw std::runtime_error("Not Implemented Exception");
 }

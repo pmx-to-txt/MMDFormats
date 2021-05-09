@@ -20,7 +20,7 @@ void pmx::VertexSkinningBDEF1::parse(std::istream& stream)
 	this->bone_index = pmx::util::parseIndex(stream, this->setting.bone_index_size);
 }
 
-std::size_t pmx::VertexSkinningBDEF1::dump(std::ostream& stream)
+std::size_t pmx::VertexSkinningBDEF1::dump(std::ostream& stream) const
 {
 	return pmx::util::dumpIndex(stream, this->bone_index, this->setting.bone_index_size);
 }
@@ -39,12 +39,12 @@ void pmx::VertexSkinningBDEF2::parse(std::istream& stream)
 	stream.read((char*)&this->bone_weight, sizeof(float));
 }
 
-std::size_t pmx::VertexSkinningBDEF2::dump(std::ostream& stream)
+std::size_t pmx::VertexSkinningBDEF2::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->bone_index1, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index2, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight)), sizeof(float));
 	total += sizeof(float);
 	return total;
 }
@@ -73,17 +73,17 @@ void pmx::VertexSkinningBDEF4::parse(std::istream& stream)
 	stream.read((char*)&this->bone_weight4, sizeof(float));
 }
 
-std::size_t pmx::VertexSkinningBDEF4::dump(std::ostream& stream)
+std::size_t pmx::VertexSkinningBDEF4::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->bone_index1, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index2, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index3, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index4, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight1)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight2)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight3)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight4)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight1)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight2)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight3)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight4)), sizeof(float));
 	total += sizeof(float) * 4;
 	return total;
 }
@@ -109,15 +109,15 @@ void pmx::VertexSkinningSDEF::parse(std::istream& stream)
 	stream.read(static_cast<char*>(static_cast<void*>(this->sdef_r1.data())), sizeof(float) * this->sdef_r1.size());
 }
 
-std::size_t pmx::VertexSkinningSDEF::dump(std::ostream& stream)
+std::size_t pmx::VertexSkinningSDEF::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->bone_index1, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index2, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(this->sdef_c.data())), sizeof(float) * this->sdef_c.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->sdef_r0.data())), sizeof(float) * this->sdef_r0.size());
-	stream.write(static_cast<char*>(static_cast<void*>(this->sdef_r1.data())), sizeof(float) * this->sdef_r1.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->sdef_c.data())), sizeof(float) * this->sdef_c.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->sdef_r0.data())), sizeof(float) * this->sdef_r0.size());
+	stream.write(static_cast<const char*>(static_cast<const void*>(this->sdef_r1.data())), sizeof(float) * this->sdef_r1.size());
 	total += sizeof(float) * 13;
 	return total;
 }
@@ -146,17 +146,17 @@ void pmx::VertexSkinningQDEF::parse(std::istream& stream)
 	stream.read(static_cast<char*>(static_cast<void*>(&this->bone_weight4)), sizeof(float));
 }
 
-std::size_t pmx::VertexSkinningQDEF::dump(std::ostream& stream)
+std::size_t pmx::VertexSkinningQDEF::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->bone_index1, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index2, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index3, this->setting.bone_index_size);
 	total += pmx::util::dumpIndex(stream, this->bone_index4, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight1)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight2)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight3)), sizeof(float));
-	stream.write(static_cast<char*>(static_cast<void*>(&this->bone_weight4)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight1)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight2)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight3)), sizeof(float));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->bone_weight4)), sizeof(float));
 	total += sizeof(float) * 4;
 	return total;
 }

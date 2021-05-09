@@ -25,16 +25,16 @@ void pmx::IkLink::parse(std::istream& stream)
 	}
 }
 
-std::size_t pmx::IkLink::dump(std::ostream& stream)
+std::size_t pmx::IkLink::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->link_target, this->setting.bone_index_size);
-	stream.write(static_cast<char*>(static_cast<void*>(&this->angle_lock)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->angle_lock)), sizeof(uint8_t));
 	total += sizeof(uint8_t);
 	if (angle_lock == 1)
 	{
-		stream.write(static_cast<char*>(static_cast<void*>(this->max_radian.data())), sizeof(float) * this->max_radian.size());
-		stream.write(static_cast<char*>(static_cast<void*>(this->min_radian.data())), sizeof(float) * this->min_radian.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(this->max_radian.data())), sizeof(float) * this->max_radian.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(this->min_radian.data())), sizeof(float) * this->min_radian.size());
 		total += sizeof(float) * 6;
 	}
 	return total;

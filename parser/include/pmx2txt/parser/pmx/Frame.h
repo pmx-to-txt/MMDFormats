@@ -22,7 +22,7 @@ namespace pmx
 	public:
 		FrameElement(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 
 	/// 表示枠
@@ -45,6 +45,6 @@ namespace pmx
 	public:
 		Frame(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

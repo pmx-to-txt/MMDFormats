@@ -27,7 +27,7 @@ namespace pmx
 	public:
 		JointParam(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 
 	class Joint
@@ -43,6 +43,6 @@ namespace pmx
 	public:
 		Joint(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

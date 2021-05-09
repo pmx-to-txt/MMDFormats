@@ -17,7 +17,7 @@ namespace pmx
 	public:
 		MorphOffset(const pmx::Setting& setting_) noexcept;
 		void virtual parse(std::istream& stream) = 0;
-		std::size_t virtual dump(std::ostream& stream) = 0;
+		std::size_t virtual dump(std::ostream& stream) const = 0;
 	};
 
 	class MorphVertexOffset : public MorphOffset
@@ -29,7 +29,7 @@ namespace pmx
 	public:
 		MorphVertexOffset(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class MorphUVOffset : public MorphOffset
@@ -41,7 +41,7 @@ namespace pmx
 	public:
 		MorphUVOffset(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class MorphBoneOffset : public MorphOffset
@@ -54,7 +54,7 @@ namespace pmx
 	public:
 		MorphBoneOffset(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class MorphMaterialOffset : public MorphOffset
@@ -75,7 +75,7 @@ namespace pmx
 	public:
 		MorphMaterialOffset(const pmx::Setting& setting_)noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class MorphGroupOffset : public MorphOffset
@@ -87,7 +87,7 @@ namespace pmx
 	public:
 		MorphGroupOffset(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class MorphFlipOffset : public MorphOffset
@@ -99,7 +99,7 @@ namespace pmx
 	public:
 		MorphFlipOffset(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class MorphImpulseOffset : public MorphOffset
@@ -113,7 +113,7 @@ namespace pmx
 	public:
 		MorphImpulseOffset(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream) override;
-		std::size_t dump(std::ostream& stream)override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	/// モーフ
@@ -150,7 +150,7 @@ namespace pmx
 	public:
 		Morph(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 
 }
