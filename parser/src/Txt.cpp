@@ -47,8 +47,8 @@ void ExportModelInfo(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
-template<typename T, size_t size>
-string ArrayToString(T(&arr)[size])
+template<size_t size, typename T>
+string ArrayToString(const T(&arr)[size])
 {
 	auto ss = stringstream{};
 	ss << "(";
@@ -61,6 +61,15 @@ string ArrayToString(T(&arr)[size])
 			ss << ")";
 	}
 	return ss.str();
+}
+
+template<size_t size, typename T>
+string ArrayToString(const T* arr)
+{
+	float buf[size];
+	for (int j = 0; j < size; ++j)
+		buf[j] = arr[j];
+	return ArrayToString(buf);
 }
 
 string ConcatJPENNames(const string& jpName, const string& enName)
@@ -215,9 +224,6 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 	{
 		auto& material = model.materials[i];
 		int numFaces = material.index_count / 3;
-		float diffuse[3];
-		for (int j = 0; j < 3; ++j)
-			diffuse[j] = material.diffuse[j];
 		bool reversible = GetBit(material.flag, 0);
 		bool groundShadow = GetBit(material.flag, 1);
 		bool selfShadowMap = GetBit(material.flag, 2);
@@ -227,7 +233,7 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 		auto sphereFileName = TextureIdxToString(material.sphere_texture_index, model);
 		auto toonFileName = material.common_toon_flag ? ToonIdxToString(material.toon_texture_index) : TextureIdxToString(material.toon_texture_index, model);
 		stream << "材質「" << ConcatJPENNames(material.material_name, material.material_english_name) << "」: " << endl;
-		stream << "-拡散色: " << ArrayToString(diffuse) << endl;
+		stream << "-拡散色: " << ArrayToString<3>(material.diffuse) << endl;
 		stream << "-反射色: " << ArrayToString(material.specular) << endl;
 		stream << "-環境色: " << ArrayToString(material.ambient) << endl;
 		stream << "-非透過度: " << material.diffuse[3] << endl;
@@ -323,7 +329,7 @@ void ExportBones(std::ostream& stream, const pmx::Model& model)
 			stream << "Target「" << BoneIdxToString(bone.ik_target_bone_index, model) << "」,";
 			stream << "Loop" << bone.ik_loop << ",";
 			stream << "単位角" << (180.0 * bone.ik_loop_angle_limit / 3.14159265) << ",";
-			for(size_t j = 0; j < bone.ik_links.size(); ++j)
+			for (size_t j = 0; j < bone.ik_links.size(); ++j)
 			{
 				auto& ik_link = bone.ik_links[j];
 				stream << "Link「" << BoneIdxToString(ik_link.link_target, model) << "」";
@@ -344,6 +350,156 @@ void ExportBones(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
+
+void ExportUVMorph(std::ostream& stream, const pmx::Morph& morph)
+{
+	if (morph.morph_type == pmx::MorphType::UV)
+	{
+		for(auto& uv_offset : morph.uv_offsets)
+		{
+			stream << "-頂点" << uv_offset.vertex_index << ": ";
+			stream << "UV移動"<< ArrayToString<2>(uv_offset.uv_offset) << endl;
+#ifdef _DEBUG
+			break;
+#endif
+		}
+	}
+	else
+	{
+		for (auto& uv_offset : morph.uv_offsets)
+		{
+			stream << "-頂点" << uv_offset.vertex_index << ": ";
+			stream << "UV移動" << ArrayToString(uv_offset.uv_offset) << endl;
+#ifdef _DEBUG
+			break;
+#endif
+		}
+	}
+}
+
+string MaterialIdxToString(int idx, const pmx::Model& model)
+{
+	if (0 <= idx && idx < model.materials.size())
+		return ConcatJPENNames(model.materials[idx].material_name, model.materials[idx].material_english_name);
+	else
+		return "";
+}
+
+string MorphIdxToString(int idx, const pmx::Model& model)
+{
+	if (0 <= idx && idx < model.morphs.size())
+		return ConcatJPENNames(model.morphs[idx].morph_name, model.morphs[idx].morph_english_name);
+	else
+		return "";
+}
+
+struct UnknownMorphCategory : exception {};
+string MorphCategoryToString(pmx::MorphCategory category)
+{
+	switch (category)
+	{
+	case pmx::MorphCategory::Eye: return "左上(目)";
+	case pmx::MorphCategory::Mouth: return "右上(ﾘｯﾌﾟ)";
+	case pmx::MorphCategory::Eyebrow: return "左下(まゆ)";
+	case pmx::MorphCategory::Other: return "右下(その他)";
+	default: throw UnknownMorphCategory{};
+	}
+}
+
+struct UnknownMorphType : exception {};
+void ExportMorphs(std::ostream& stream, const pmx::Model& model)
+{
+	for (int i = 0; i < model.morphs.size(); ++i)
+	{
+		auto& morph = model.morphs[i];
+		auto name = ConcatJPENNames(morph.morph_name, morph.morph_english_name);
+		switch (morph.morph_type)
+		{
+		case pmx::MorphType::Vertex:
+			stream << "頂点モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			for (auto& vertex_offset : morph.vertex_offsets)
+			{
+				stream << "-頂点" << vertex_offset.vertex_index << ": ";
+				stream << "移動" << ArrayToString(vertex_offset.position_offset) << endl;
+#ifdef _DEBUG
+				break;
+#endif
+			}
+			break;
+		case pmx::MorphType::UV:
+			stream << "UVモーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			ExportUVMorph(stream, morph);
+			break;
+		case pmx::MorphType::AdditionalUV1:
+			stream << "追加UV1モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			ExportUVMorph(stream, morph);
+			break;
+		case pmx::MorphType::AdditionalUV2:
+			stream << "追加UV2モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			ExportUVMorph(stream, morph);
+			break;
+		case pmx::MorphType::AdditionalUV3:
+			stream << "追加UV3モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			ExportUVMorph(stream, morph);
+			break;
+		case pmx::MorphType::AdditionalUV4:
+			stream << "追加UV4モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			ExportUVMorph(stream, morph);
+			break;
+		case pmx::MorphType::Bone:
+			stream << "ボーンモーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			for (auto& bone_offset : morph.bone_offsets)
+			{
+				stream << "-ボーン「" << BoneIdxToString(bone_offset.bone_index, model) << "」: ";
+				stream << "移動" << ArrayToString(bone_offset.translation) << ",";
+				stream << "回転クォータニオン" << ArrayToString(bone_offset.rotation) << endl;
+#ifdef _DEBUG
+				break;
+#endif
+			}
+			break;
+		case pmx::MorphType::Matrial:
+			stream << "材質モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			for (auto& material_offset : morph.material_offsets)
+			{
+				stream << "-材質「" << MaterialIdxToString(material_offset.material_index, model) << "」: ";
+				stream << (material_offset.offset_operation ? "加算" : "乗算") << ",";
+				stream << "拡散色" << ArrayToString<3>(material_offset.diffuse) << ",";
+				stream << "反射色" << ArrayToString(material_offset.specular) << ",";
+				stream << "環境色" << ArrayToString(material_offset.ambient) << ",";
+				stream << "非透過度" << material_offset.diffuse[3] << ",";
+				stream << "反射強度" << material_offset.specularity << ",";
+				stream << "エッジサイズ" << material_offset.edge_size << ",";
+				stream << "エッジ色" << ArrayToString(material_offset.edge_color) << ",";
+				stream << "Tex" << ArrayToString(material_offset.texture_argb) << ",";
+				stream << "ｽﾌｨｱ" << ArrayToString(material_offset.sphere_texture_argb) << ",";
+				stream << "Toon" << ArrayToString(material_offset.toon_texture_argb) << endl;
+#ifdef _DEBUG
+				break;
+#endif
+			}
+			break;
+		case pmx::MorphType::Group:
+			stream << "グループモーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
+			for (auto& group_offset : morph.group_offsets)
+			{
+				stream << "-モーフ「" << MorphIdxToString(group_offset.morph_index, model) << "」: ";
+				stream << "影響度" <<group_offset.morph_weight << endl;
+#ifdef _DEBUG
+				break;
+#endif
+			}
+			break;
+		default:
+			throw UnknownMorphType{};
+		}
+
+#ifdef _DEBUG
+		break;
+#endif
+	}
+}
+
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 {
 	ExportVersion(stream, model);
@@ -352,4 +508,5 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportVertices(stream, model);
 	ExportMaterials(stream, model);
 	ExportBones(stream, model);
+	ExportMorphs(stream, model);
 }
