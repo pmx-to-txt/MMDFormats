@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     pmx::Model x;
     x.parse(is);
 
-    system("chcp.com 65001");
+    system("chcp.com 65001 > nul");
     pmx2txt::txt::Export(std::cout, x);
 
     /*
