@@ -137,7 +137,9 @@ void ExportVertices(std::ostream& stream, const pmx::Model& model)
 		ExportSkinning(stream, model, vertex);
 		stream << endl;
 
+#ifdef _DEBUG
 		break;
+#endif
 	}
 }
 
@@ -151,7 +153,9 @@ void ExportFaces(std::ostream& stream, const pmx::Model& model, int offset, int 
 		stream << ArrayToString(indices);
 		stream << endl;
 
+#ifdef _DEBUG
 		break;
+#endif
 	}
 }
 
@@ -191,9 +195,9 @@ string SphereModeToString(USphereMode sphereMode)
 {
 	switch (sphereMode)
 	{
-	case 0: return "ｽﾌｨｱ無効";
-	case 1: return "乗算ｽﾌｨｱ";
-	case 2: return "加算ｽﾌｨｱ";
+	case 0: return "- 無効";
+	case 1: return "x 乗算ｽﾌｨｱ";
+	case 2: return "+ 加算ｽﾌｨｱ";
 	case 3: return "サブTex";
 	default: throw UnknownSphereMode{};
 	}
@@ -217,39 +221,42 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 		auto textureFileName = TextureIdxToString(material.diffuse_texture_index, model);
 		auto sphereFileName = TextureIdxToString(material.sphere_texture_index, model);
 		auto toonFileName = material.common_toon_flag ? ToonIdxToString(material.toon_texture_index) : TextureIdxToString(material.toon_texture_index, model);
-		stream << "材質「" << ConcatJPENNames(material.material_name, material.material_english_name) << "」: ";
-		stream << "拡散色" << ArrayToString(diffuse) << ",";
-		stream << "反射色" << ArrayToString(material.specular) << ",";
-		stream << "環境色" << ArrayToString(material.ambient) << ",";
-		stream << "非透過度" << material.diffuse[3] << ",";
-		stream << "反射強度" << material.specularlity << ",";
-		if (reversible)
-			stream << "両面描画" << ",";
-		if (groundShadow)
-			stream << "地面影" << ",";
-		if (selfShadowMap)
-			stream << "ｾﾙﾌ影ﾏｯﾌﾟ" << ",";
-		if (selfShadow)
-			stream << "ｾﾙﾌ影" << ",";
-		stream << "エッジ" << (drawEdge ? "有効" : "無効") << ",";
-		stream << "エッジサイズ" << material.edge_size << ",";
-		stream << "エッジ色" << ArrayToString(material.edge_color) << ",";
+		stream << "材質「" << ConcatJPENNames(material.material_name, material.material_english_name) << "」: " << endl;
+		stream << "-拡散色: " << ArrayToString(diffuse) << endl;
+		stream << "-反射色: " << ArrayToString(material.specular) << endl;
+		stream << "-環境色: " << ArrayToString(material.ambient) << endl;
+		stream << "-非透過度: " << material.diffuse[3] << endl;
+		stream << "-反射強度: " << material.specularlity << endl;
+		stream << "-描画フラグ: ";
+		stream << (reversible ? "両面描画" : "片面描画") << ",";
+		stream << (groundShadow ? "地面影あり" : "地面影なし") << ",";
+		stream << (selfShadowMap ? "ｾﾙﾌ影ﾏｯﾌﾟあり" : "ｾﾙﾌ影ﾏｯﾌﾟなし") << ",";
+		stream << (selfShadow ? "ｾﾙﾌ影あり" : "ｾﾙﾌ影なし") << endl;
+		if (drawEdge)
+		{
+			stream << "-エッジサイズ: " << material.edge_size << endl;
+			stream << "-エッジ色: " << ArrayToString(material.edge_color) << endl;
+		}
 		if (textureFileName.length() > 0)
-			stream << "Tex「" << textureFileName << "」,";
-		if (toonFileName.length() > 0)
-			stream << "Toon「" << toonFileName << "」,";
+			stream << "-Tex: " << textureFileName << endl;
 		if (sphereFileName.length() > 0)
-			stream << "ｽﾌｨｱ「" << sphereFileName << "」,";
-		stream << SphereModeToString(material.sphere_op_mode) << endl;
+			stream << "-スフィア: " << sphereFileName << endl;
+		stream << "-スフィアモード: " << SphereModeToString(material.sphere_op_mode) << endl;
+		if (toonFileName.length() > 0)
+			stream << "-Toon: " << toonFileName << endl;
 		if (material.memo.length() > 0)
 		{
+			stream << "-メモ: " << endl;
 			stream << "----------------" << endl;
 			stream << material.memo << endl;
 			stream << "----------------" << endl;
 		}
 		ExportFaces(stream, model, curFaceIdx, numFaces);
 		curFaceIdx += numFaces;
+
+#ifdef _DEBUG
 		break;
+#endif
 	}
 }
 
