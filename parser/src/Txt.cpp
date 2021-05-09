@@ -355,10 +355,10 @@ void ExportUVMorph(std::ostream& stream, const pmx::Morph& morph)
 {
 	if (morph.morph_type == pmx::MorphType::UV)
 	{
-		for(auto& uv_offset : morph.uv_offsets)
+		for (auto& uv_offset : morph.uv_offsets)
 		{
 			stream << "-頂点" << uv_offset.vertex_index << ": ";
-			stream << "UV移動"<< ArrayToString<2>(uv_offset.uv_offset) << endl;
+			stream << "UV移動" << ArrayToString<2>(uv_offset.uv_offset) << endl;
 #ifdef _DEBUG
 			break;
 #endif
@@ -484,7 +484,7 @@ void ExportMorphs(std::ostream& stream, const pmx::Model& model)
 			for (auto& group_offset : morph.group_offsets)
 			{
 				stream << "-モーフ「" << MorphIdxToString(group_offset.morph_index, model) << "」: ";
-				stream << "影響度" <<group_offset.morph_weight << endl;
+				stream << "影響度" << group_offset.morph_weight << endl;
 #ifdef _DEBUG
 				break;
 #endif
@@ -500,6 +500,25 @@ void ExportMorphs(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
+void ExportFrames(std::ostream& stream, const pmx::Model& model)
+{
+	for (auto& frame : model.frames)
+	{
+		stream << "表示枠「" << ConcatJPENNames(frame.frame_name, frame.frame_english_name) << "」: " << endl;
+		for (auto& element : frame.elements)
+		{
+			if(element.element_target == 0)
+				stream << "-ボーン「" << BoneIdxToString(element.index, model) << "」" << endl;
+			else
+				stream << "-モーフ「" << MorphIdxToString(element.index, model) << "」" << endl;
+
+#ifdef _DEBUG
+			//break;
+#endif
+		}
+	}
+}
+
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 {
 	ExportVersion(stream, model);
@@ -509,4 +528,5 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportMaterials(stream, model);
 	ExportBones(stream, model);
 	ExportMorphs(stream, model);
+	ExportFrames(stream, model);
 }
