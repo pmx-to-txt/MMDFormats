@@ -6,3 +6,4 @@ project(pmx-parser)
 
 add_subdirectory(parser)
 add_subdirectory(test)
+add_subdirectory(pmx2txt)
