@@ -38,16 +38,16 @@ void pmx::Setting::parse(std::istream& stream)
 	}
 }
 
-std::size_t pmx::Setting::dump(std::ostream& stream)
+std::size_t pmx::Setting::dump(std::ostream& stream) const
 {
 	stream.write(u8"\x08", sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&encoding)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&uv)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&vertex_index_size)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&texture_index_size)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&material_index_size)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&bone_index_size)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&morph_index_size)), sizeof(uint8_t));
-	stream.write(static_cast<char*>(static_cast<void*>(&rigidbody_index_size)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&encoding)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&uv)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&vertex_index_size)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&texture_index_size)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&material_index_size)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&bone_index_size)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&morph_index_size)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&rigidbody_index_size)), sizeof(uint8_t));
 	return 9u;
 }

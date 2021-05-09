@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <iostream>
 #include <string>
 
@@ -24,9 +25,9 @@ namespace pmx
 		uint16_t mask;
 		/// 形状
 		uint8_t shape;
-		float size[3];
-		float position[3];
-		float orientation[3];
+		std::array<float, 3> size; // dimension
+		std::array<float, 3> position;
+		std::array<float, 3> orientation;
 		float mass;
 		float move_attenuation;
 		float rotation_attenuation;
@@ -37,6 +38,6 @@ namespace pmx
 	public:
 		RigidBody(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

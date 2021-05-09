@@ -1,9 +1,9 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <memory>
 
 #include "pmx2txt/parser/pmx/enum.h"
@@ -18,15 +18,15 @@ namespace pmx
 		const pmx::Setting& setting;
 	public:
 		/// 位置
-		float positon[3];
+		std::array<float,3> positon;
 		/// 法線
-		float normal[3];
+		std::array<float, 3> normal;
 		/// テクスチャ座標
-		float uv[2];
+		std::array<float, 2> uv;
 		/// 追加テクスチャ座標
-		float uva[4][4];
+		std::array<std::array<float, 4>, 4> uva;
 		/// スキニングタイプ
-		pmx::VertexSkinningType skinning_type{ pmx::VertexSkinningType::BDEF1 };
+		pmx::VertexSkinningType skinning_type;
 		/// スキニング
 		std::unique_ptr<pmx::VertexSkinning> skinning{ nullptr };
 		/// エッジ倍率
@@ -35,6 +35,6 @@ namespace pmx
 	public:
 		Vertex(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

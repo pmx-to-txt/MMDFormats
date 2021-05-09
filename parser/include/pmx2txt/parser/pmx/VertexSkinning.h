@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <iostream>
 
 #include "pmx2txt/parser/pmx/Setting.h"
@@ -13,7 +14,7 @@ namespace pmx
 	public:
 		VertexSkinning(const pmx::Setting& setting_) noexcept;
 		virtual void parse(std::istream& stream) = 0;
-		virtual std::size_t dump(std::ostream& stream) = 0;
+		virtual std::size_t dump(std::ostream& stream) const = 0;
 	};
 
 	class VertexSkinningBDEF1 : public VertexSkinning
@@ -24,7 +25,7 @@ namespace pmx
 	public:
 		VertexSkinningBDEF1(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stresam) override;
-		std::size_t dump(std::ostream& stream) override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class VertexSkinningBDEF2 : public VertexSkinning
@@ -37,7 +38,7 @@ namespace pmx
 	public:
 		VertexSkinningBDEF2(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stresam)override;
-		std::size_t dump(std::ostream& stream) override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class VertexSkinningBDEF4 : public VertexSkinning
@@ -55,7 +56,7 @@ namespace pmx
 	public:
 		VertexSkinningBDEF4(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stresam)override;
-		std::size_t dump(std::ostream& stream) override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class VertexSkinningSDEF : public VertexSkinning
@@ -64,14 +65,14 @@ namespace pmx
 		int bone_index1;
 		int bone_index2;
 		float bone_weight;
-		float sdef_c[3];
-		float sdef_r0[3];
-		float sdef_r1[3];
+		std::array<float,3> sdef_c;
+		std::array<float, 3> sdef_r0;
+		std::array<float, 3> sdef_r1;
 
 	public:
 		VertexSkinningSDEF(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stresam)override;
-		std::size_t dump(std::ostream& stream) override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 
 	class VertexSkinningQDEF : public VertexSkinning
@@ -89,6 +90,6 @@ namespace pmx
 	public:
 		VertexSkinningQDEF(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stresam)override;
-		std::size_t dump(std::ostream& stream) override;
+		std::size_t dump(std::ostream& stream) const override;
 	};
 }

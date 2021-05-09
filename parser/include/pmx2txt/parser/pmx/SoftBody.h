@@ -21,7 +21,7 @@ namespace pmx
 		int target_material;
 		uint8_t group;
 		uint16_t mask;
-		SoftBodyFlag flag{ pmx::SoftBodyFlag::BLink };
+		SoftBodyFlag flag;
 		int blink_distance;
 		int cluster_count;
 		float mass;
@@ -60,7 +60,7 @@ namespace pmx
 	public:
 		SoftBody(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 
 

@@ -19,7 +19,7 @@ namespace pmx
 		/// ボーン英名
 		std::string bone_english_name;
 		/// 位置
-		float position[3];
+		std::array<float, 3> position;
 		/// 親ボーンインデックス
 		int parent_index;
 		/// 階層
@@ -27,7 +27,7 @@ namespace pmx
 		/// ボーンフラグ
 		uint16_t bone_flag;
 		/// 座標オフセット(has Target)
-		float offset[3];
+		std::array<float, 3> offset;
 		/// 接続先ボーンインデックス(not has Target)
 		int target_index;
 		/// 付与親ボーンインデックス
@@ -35,11 +35,11 @@ namespace pmx
 		/// 付与率
 		float grant_weight;
 		/// 固定軸の方向
-		float lock_axis_orientation[3];
+		std::array<float, 3> lock_axis_orientation;
 		/// ローカル軸のX軸方向
-		float local_axis_x_orientation[3];
+		std::array<float, 3> local_axis_x_orientation;
 		/// ローカル軸のY軸方向
-		float local_axis_y_orientation[3];
+		std::array<float, 3> local_axis_y_orientation;
 		/// 外部親変形のkey値
 		int key;
 		/// IKターゲットボーン
@@ -56,6 +56,6 @@ namespace pmx
 	public:
 		Bone(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

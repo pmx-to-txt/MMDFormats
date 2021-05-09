@@ -7,10 +7,13 @@
 
 pmx::SoftBody::SoftBody(const pmx::Setting& setting_) noexcept
 	: setting(setting_)
+	, soft_body_name()
+	, soft_body_english_name()
 	, shape(0)
 	, target_material(0)
 	, group(0)
 	, mask(0)
+	, flag(pmx::SoftBodyFlag::BLink)
 	, blink_distance(0)
 	, cluster_count(0)
 	, mass(0.0)
@@ -42,7 +45,9 @@ pmx::SoftBody::SoftBody(const pmx::Setting& setting_) noexcept
 	, AST(0.0f)
 	, VST(0.0f)
 	, anchor_count(0)
+	, anchors()
 	, pin_vertex_count(0)
+	, pin_vertices()
 {}
 
 void pmx::SoftBody::parse(std::istream& stream)
@@ -51,7 +56,7 @@ void pmx::SoftBody::parse(std::istream& stream)
 	throw std::runtime_error("Not Implemented Exception");
 }
 
-std::size_t pmx::SoftBody::dump(std::ostream& stream)
+std::size_t pmx::SoftBody::dump(std::ostream& stream) const
 {
 	throw std::runtime_error("Not Implemented Exception");
 }

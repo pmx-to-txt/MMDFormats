@@ -105,7 +105,7 @@
 			buf = std::vector<char>(str.cbegin(), str.cend());
 		}
 		int total = buf.size();
-		stream.write(static_cast<char*>(static_cast<void*>(&total)), sizeof(int));
-		stream.write(static_cast<char*>(static_cast<void*>(buf.data())), buf.size());
+		stream.write(static_cast<const char*>(static_cast<const void*>(&total)), sizeof(int));
+		stream.write(static_cast<const char*>(static_cast<const void*>(buf.data())), buf.size());
 		return total + sizeof(int);
 	}

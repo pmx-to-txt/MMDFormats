@@ -24,10 +24,10 @@ void pmx::FrameElement::parse(std::istream& stream)
 	}
 }
 
-std::size_t pmx::FrameElement::dump(std::ostream& stream)
+std::size_t pmx::FrameElement::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
-	stream.write(static_cast<char*>(static_cast<void*>(&this->element_target)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->element_target)), sizeof(uint8_t));
 	total += sizeof(uint8_t);
 	if (this->element_target == 0x00)
 	{
@@ -59,21 +59,21 @@ void pmx::Frame::parse(std::istream& stream)
 	}
 }
 
-std::size_t pmx::Frame::dump(std::ostream& stream)
+std::size_t pmx::Frame::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpString(stream, this->frame_name, this->setting.encoding);
 	total += pmx::util::dumpString(stream, this->frame_english_name, this->setting.encoding);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->frame_flag)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->frame_flag)), sizeof(uint8_t));
 	total += sizeof(uint8_t);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->element_count)), sizeof(int));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->element_count)), sizeof(int));
 	total += sizeof(int);
 
 	for (int i = 0; i < this->element_count; i++)
 	{
-		total += this->elements[i].dump(stream);
+		total += this->elements.at(i).dump(stream);
 	}
 	return total;
 }

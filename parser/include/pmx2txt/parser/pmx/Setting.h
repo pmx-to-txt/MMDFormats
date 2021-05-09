@@ -30,6 +30,6 @@ namespace pmx
 	public:
 		Setting() noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

@@ -19,13 +19,13 @@ void pmx::AnchorRigidBody::parse(std::istream& stream)
 	stream.read((char*)&this->is_near, sizeof(uint8_t));
 }
 
-std::size_t pmx::AnchorRigidBody::dump(std::ostream& stream)
+std::size_t pmx::AnchorRigidBody::dump(std::ostream& stream) const
 {
 	std::size_t total{ 0 };
 	total += pmx::util::dumpIndex(stream, this->related_rigid_body, this->setting.rigidbody_index_size);
 	total += pmx::util::dumpIndex(stream, this->related_vertex, this->setting.vertex_index_size);
 
-	stream.write(static_cast<char*>(static_cast<void*>(&this->is_near)), sizeof(uint8_t));
+	stream.write(static_cast<const char*>(static_cast<const void*>(&this->is_near)), sizeof(uint8_t));
 	total += sizeof(uint8_t);
 	return total;
 }

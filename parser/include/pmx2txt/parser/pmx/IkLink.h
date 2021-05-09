@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <iostream>
 
 #include "pmx2txt/parser/pmx/Setting.h"
@@ -17,13 +18,13 @@ namespace pmx
 		/// 角度制限
 		uint8_t angle_lock;
 		/// 最大制限角度
-		float max_radian[3];
+		std::array<float, 3> max_radian;
 		/// 最小制限角度
-		float min_radian[3];
+		std::array<float, 3> min_radian;
 
 	public:
 		IkLink(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }

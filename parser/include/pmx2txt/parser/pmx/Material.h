@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <iostream>
 #include <string>
 
@@ -18,17 +19,17 @@ namespace pmx
 		/// モデル英名
 		std::string material_english_name;
 		/// 減衰色
-		float diffuse[4];
+		std::array<float, 4> diffuse;
 		/// 光沢色
-		float specular[3];
+		std::array<float, 3> specular;
 		/// 光沢度
 		float specularlity;
 		/// 環境色
-		float ambient[3];
+		std::array<float, 3> ambient;
 		/// 描画フラグ
 		uint8_t flag;
 		/// エッジ色
-		float edge_color[4];
+		std::array<float, 4> edge_color;
 		/// エッジサイズ
 		float edge_size;
 		/// アルベドテクスチャインデックス
@@ -49,6 +50,6 @@ namespace pmx
 	public:
 		Material(const pmx::Setting& setting_) noexcept;
 		void parse(std::istream& stream);
-		std::size_t dump(std::ostream& stream);
+		std::size_t dump(std::ostream& stream) const;
 	};
 }
