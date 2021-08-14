@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <iostream>
 
 namespace pmx
@@ -13,5 +14,7 @@ namespace util
 	std::string parseString(std::istream& stream, uint8_t encoding);
 
 	size_t dumpString(std::ostream& stream, const std::string& str, uint8_t encoding);
+
+	template <typename Target, typename HashType> HashType getHashCode32(const Target& target);
 }
 }
