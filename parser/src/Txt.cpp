@@ -428,6 +428,7 @@ string MorphCategoryToString(pmx::MorphCategory category)
 {
 	switch (category)
 	{
+	case pmx::MorphCategory::ReservedCategory: return "（カテゴリ未設定）";
 	case pmx::MorphCategory::Eye: return "左上(目)";
 	case pmx::MorphCategory::Mouth: return "右上(ﾘｯﾌﾟ)";
 	case pmx::MorphCategory::Eyebrow: return "左下(まゆ)";
