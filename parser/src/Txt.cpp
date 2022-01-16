@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <optional>
 
 using namespace std;
 
@@ -48,9 +49,11 @@ void ExportModelInfo(std::ostream& stream, const pmx::Model& model)
 }
 
 template<size_t size, typename T>
-string ArrayToString(const T(&arr)[size])
+string ArrayToString(const T(&arr)[size], std::optional<streamsize> precision = nullopt)
 {
 	auto ss = stringstream{};
+	if (precision.has_value())
+		ss << std::setprecision(precision.value());
 	ss << "(";
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -82,18 +85,18 @@ string RotationArrayToString(const array<T, size>& arr)
 }
 
 template<size_t size, typename T>
-string ArrayToString(const T* arr)
+string ArrayToString(const T* arr, std::optional<streamsize> precision = nullopt)
 {
 	float buf[size];
 	for (int j = 0; j < size; ++j)
 		buf[j] = arr[j];
-	return ArrayToString(buf);
+	return ArrayToString(buf, precision);
 }
 
 template<size_t size, typename T>
-string ArrayToString(const array<T, size>& arr)
+string ArrayToString(const array<T, size>& arr, std::optional<streamsize> precision = nullopt)
 {
-	return ArrayToString<size>(arr.data());
+	return ArrayToString<size>(arr.data(), precision);
 }
 
 template<size_t size, size_t size2, typename T>
@@ -349,8 +352,8 @@ void ExportBones(std::ostream& stream, const pmx::Model& model)
 			stream << "軸制限" << ArrayToString(bone.lock_axis_orientation) << ",";
 		if (localAxis)
 		{
-			stream << "ﾛｰｶﾙ軸X" << ArrayToString(bone.local_axis_x_orientation) << ",";
-			stream << "ﾛｰｶﾙ軸Z" << ArrayToString(bone.local_axis_y_orientation) << ",";
+			stream << "ﾛｰｶﾙ軸X" << ArrayToString(bone.local_axis_x_orientation, 3) << ",";
+			stream << "ﾛｰｶﾙ軸Z" << ArrayToString(bone.local_axis_y_orientation, 3) << ",";
 		}
 		if (externParent)
 			stream << "外部親Key" << bone.key << ",";
