@@ -6,6 +6,35 @@
 
 using namespace std;
 
+struct SVertexID
+{
+	string materialName;
+	int idxInMaterial = -1;
+};
+
+vector<SVertexID> CreateVertexIDs(const pmx::Model& model)
+{
+	vector<SVertexID> ret(model.vertices.size());
+	int64_t curIndexOffset = 0;
+	for (auto& material : model.materials)
+	{
+		int curVertexIdxInMaterial = 0;
+		int numIndices = material.index_count;
+		for (int64_t curIndexIdx = 0; curIndexIdx < numIndices; ++curIndexIdx)
+		{
+			auto vertexIdx = model.indices[curIndexOffset + curIndexIdx];
+			if (ret[vertexIdx].idxInMaterial < 0)
+			{
+				ret[vertexIdx].materialName = material.material_name;
+				ret[vertexIdx].idxInMaterial = curVertexIdxInMaterial;
+				curVertexIdxInMaterial++;
+			}
+		}
+		curIndexOffset += numIndices;
+	}
+	return ret;
+}
+
 void ExportVersion(std::ostream& stream, const pmx::Model& model)
 {
 	auto defaultPrecision = stream.precision();
@@ -674,6 +703,7 @@ void ExportJoints(std::ostream& stream, const pmx::Model& model)
 
 void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 {
+	auto vertexIDs = CreateVertexIDs(model);
 	ExportVersion(stream, model);
 	ExportSetting(stream, model);
 	ExportModelInfo(stream, model);
