@@ -600,7 +600,7 @@ string RigidBodyShapeToString(URigidBodyShape shape)
 	}
 }
 
-string RigidBodyShapeToSizeString(URigidBodyShape shape, const array<float, 3> &size)
+string RigidBodyShapeToSizeString(URigidBodyShape shape, const array<float, 3>& size)
 {
 	stringstream ss;
 	switch (shape)
