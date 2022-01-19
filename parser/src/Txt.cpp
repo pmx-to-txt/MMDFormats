@@ -12,6 +12,11 @@ struct SVertexID
 	int idxInMaterial = -1;
 };
 
+string to_string(const SVertexID& vertexID)
+{
+	return vertexID.materialName + "[" + to_string(vertexID.idxInMaterial) + "]";
+}
+
 vector<SVertexID> CreateVertexIDs(const pmx::Model& model)
 {
 	vector<SVertexID> ret(model.vertices.size());
@@ -218,12 +223,12 @@ void ExportVertice(std::ostream& stream, const pmx::Model& model, const pmx::Ver
 	stream << endl;
 }
 
-void ExportVertices(std::ostream& stream, const pmx::Model& model)
+void ExportVertices(std::ostream& stream, const pmx::Model& model, const vector<SVertexID>& vertexIDs)
 {
 	for (size_t i = 0; i < model.vertices.size(); ++i)
 	{
 		auto& vertex = model.vertices[i];
-		stream << "頂点" << i << ": ";
+		stream << "頂点「" << to_string(vertexIDs[i]) << "」: ";
 		ExportVertice(stream, model, vertex);
 
 #ifdef _DEBUG
@@ -232,14 +237,17 @@ void ExportVertices(std::ostream& stream, const pmx::Model& model)
 	}
 }
 
-void ExportFaces(std::ostream& stream, const pmx::Model& model, int offset, int num)
+void ExportFaces(std::ostream& stream, const pmx::Model& model, int offset, int num, const vector<SVertexID>& vertexIDs)
 {
 	for (int i = offset; i < offset + num; ++i)
 	{
-		int indices[3];
+		string curVertexIDs[3];
 		for (int j = 0; j < 3; ++j)
-			indices[j] = model.indices[static_cast<int64_t>(i) * 3 + j];
-		stream << ArrayToString(indices);
+		{
+			auto index = model.indices[static_cast<int64_t>(i) * 3 + j];
+			curVertexIDs[j] = to_string(vertexIDs[index]);
+		}
+		stream << ArrayToString(curVertexIDs);
 		stream << endl;
 
 #ifdef _DEBUG
@@ -284,7 +292,7 @@ bool GetBit(int flags, int bit)
 	return (flags & (0x1 << bit)) != 0;
 }
 
-void ExportMaterials(std::ostream& stream, const pmx::Model& model)
+void ExportMaterials(std::ostream& stream, const pmx::Model& model, const vector<SVertexID>& vertexIDs)
 {
 	int curFaceIdx = 0;
 	for (int i = 0; i < model.materials.size(); ++i)
@@ -329,7 +337,7 @@ void ExportMaterials(std::ostream& stream, const pmx::Model& model)
 			stream << material.memo << endl;
 			stream << "----------------" << endl;
 		}
-		ExportFaces(stream, model, curFaceIdx, numFaces);
+		ExportFaces(stream, model, curFaceIdx, numFaces, vertexIDs);
 		curFaceIdx += numFaces;
 
 #ifdef _DEBUG
@@ -418,13 +426,13 @@ void ExportBones(std::ostream& stream, const pmx::Model& model)
 }
 
 
-void ExportUVMorph(std::ostream& stream, const pmx::Morph& morph)
+void ExportUVMorph(std::ostream& stream, const pmx::Morph& morph, const vector<SVertexID>& vertexIDs)
 {
 	if (morph.morph_type == pmx::MorphType::UV)
 	{
 		for (auto& uv_offset : morph.uv_offsets)
 		{
-			stream << "-頂点" << uv_offset.vertex_index << ": ";
+			stream << "-頂点「" << to_string(vertexIDs[uv_offset.vertex_index]) << "」: ";
 			stream << "UV移動" << ArrayToString<2>(uv_offset.uv_offset) << endl;
 #ifdef _DEBUG
 			break;
@@ -435,7 +443,7 @@ void ExportUVMorph(std::ostream& stream, const pmx::Morph& morph)
 	{
 		for (auto& uv_offset : morph.uv_offsets)
 		{
-			stream << "-頂点" << uv_offset.vertex_index << ": ";
+			stream << "-頂点「" << to_string(vertexIDs[uv_offset.vertex_index]) << "」: ";
 			stream << "UV移動" << ArrayToString(uv_offset.uv_offset) << endl;
 #ifdef _DEBUG
 			break;
@@ -475,7 +483,7 @@ string MorphCategoryToString(pmx::MorphCategory category)
 }
 
 struct UnknownMorphType : exception {};
-void ExportMorphs(std::ostream& stream, const pmx::Model& model)
+void ExportMorphs(std::ostream& stream, const pmx::Model& model, const vector<SVertexID>& vertexIDs)
 {
 	for (int i = 0; i < model.morphs.size(); ++i)
 	{
@@ -487,7 +495,7 @@ void ExportMorphs(std::ostream& stream, const pmx::Model& model)
 			stream << "頂点モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
 			for (auto& vertex_offset : morph.vertex_offsets)
 			{
-				stream << "-頂点" << vertex_offset.vertex_index << ": ";
+				stream << "-頂点「" << to_string(vertexIDs[vertex_offset.vertex_index]) << "」: ";
 				stream << "移動" << ArrayToString(vertex_offset.position_offset) << endl;
 #ifdef _DEBUG
 				break;
@@ -496,23 +504,23 @@ void ExportMorphs(std::ostream& stream, const pmx::Model& model)
 			break;
 		case pmx::MorphType::UV:
 			stream << "UVモーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
-			ExportUVMorph(stream, morph);
+			ExportUVMorph(stream, morph, vertexIDs);
 			break;
 		case pmx::MorphType::AdditionalUV1:
 			stream << "追加UV1モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
-			ExportUVMorph(stream, morph);
+			ExportUVMorph(stream, morph, vertexIDs);
 			break;
 		case pmx::MorphType::AdditionalUV2:
 			stream << "追加UV2モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
-			ExportUVMorph(stream, morph);
+			ExportUVMorph(stream, morph, vertexIDs);
 			break;
 		case pmx::MorphType::AdditionalUV3:
 			stream << "追加UV3モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
-			ExportUVMorph(stream, morph);
+			ExportUVMorph(stream, morph, vertexIDs);
 			break;
 		case pmx::MorphType::AdditionalUV4:
 			stream << "追加UV4モーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
-			ExportUVMorph(stream, morph);
+			ExportUVMorph(stream, morph, vertexIDs);
 			break;
 		case pmx::MorphType::Bone:
 			stream << "ボーンモーフ「" << name << "」[" << MorphCategoryToString(morph.category) << "]: " << endl;
@@ -707,10 +715,10 @@ void pmx2txt::txt::Export(std::ostream& stream, const pmx::Model& model)
 	ExportVersion(stream, model);
 	ExportSetting(stream, model);
 	ExportModelInfo(stream, model);
-	ExportVertices(stream, model);
-	ExportMaterials(stream, model);
+	ExportVertices(stream, model, vertexIDs);
+	ExportMaterials(stream, model, vertexIDs);
 	ExportBones(stream, model);
-	ExportMorphs(stream, model);
+	ExportMorphs(stream, model, vertexIDs);
 	ExportFrames(stream, model);
 	ExportRigidBodies(stream, model);
 	ExportJoints(stream, model);
