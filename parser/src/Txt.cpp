@@ -177,20 +177,25 @@ void ExportSkinning(std::ostream& stream, const pmx::Model& model, const pmx::Ve
 	}
 }
 
+void ExportVertice(std::ostream& stream, const pmx::Model& model, const pmx::Vertex& vertex)
+{
+	stream << "位置" << ArrayToString(vertex.positon) << ",";
+	stream << "法線" << ArrayToString(vertex.normal) << ",";
+	stream << "エッジ倍率" << vertex.edge << ",";
+	stream << "UV" << ArrayToString(vertex.uv) << ",";
+	for (size_t j = 0; j < model.setting.uv; ++j)
+		stream << "追加UV" << (j + 1) << ArrayToString(vertex.uva[j]) << ",";
+	ExportSkinning(stream, model, vertex);
+	stream << endl;
+}
+
 void ExportVertices(std::ostream& stream, const pmx::Model& model)
 {
 	for (size_t i = 0; i < model.vertices.size(); ++i)
 	{
 		auto& vertex = model.vertices[i];
 		stream << "頂点" << i << ": ";
-		stream << "位置" << ArrayToString(vertex.positon) << ",";
-		stream << "法線" << ArrayToString(vertex.normal) << ",";
-		stream << "エッジ倍率" << vertex.edge << ",";
-		stream << "UV" << ArrayToString(vertex.uv) << ",";
-		for (size_t j = 0; j < model.setting.uv; ++j)
-			stream << "追加UV" << (j + 1) << ArrayToString(vertex.uva[j]) << ",";
-		ExportSkinning(stream, model, vertex);
-		stream << endl;
+		ExportVertice(stream, model, vertex);
 
 #ifdef _DEBUG
 		break;
